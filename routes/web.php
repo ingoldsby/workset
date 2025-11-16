@@ -14,6 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/plan', fn () => view('plan.index'))->name('plan.index');
     Route::get('/log', fn () => view('log.index'))->name('log.index');
     Route::get('/programs', fn () => view('programs.index'))->name('programs.index');
+    Route::get('/programs/progression-builder', fn () => view('programs.progression-builder'))->name('programs.progressionBuilder');
     Route::get('/exercises', fn () => view('exercises.index'))->name('exercises.index');
     Route::get('/history', fn () => view('history.index'))->name('history.index');
     Route::get('/analytics', fn () => view('analytics.index'))->name('analytics.index');

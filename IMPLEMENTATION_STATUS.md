@@ -163,18 +163,49 @@ All main application sections have been implemented with Livewire components:
 - ✅ Responsive mobile navigation
 - ✅ Consistent UI/UX across all sections
 
-## 🚧 Next Steps (Not Yet Implemented)
+## ✅ Phase 5: Progression Rule Builder (COMPLETE)
+Comprehensive form-based progression rule system implemented:
 
-### Phase 5: Progression Rule Builder
-Form-based builder for:
-- Linear progression (with caps)
-- Double progression
-- Top-set + back-off (% or kg)
-- RPE targets with tolerance
-- Miss handling (auto-reduce/deload)
-- Planned deloads (every N weeks by Z%)
-- Weekly undulation (H/M/L)
-- Per-exercise custom warm-ups
+### Core Features
+- ✅ ProgressionRuleType enum with all rule types
+- ✅ ProgressionRuleBuilder Livewire component with full validation
+- ✅ ProgressionRulePreview component for displaying rules
+- ✅ Standalone progression builder page accessible from Programs section
+- ✅ Support for multiple rules per exercise
+
+### Rule Types Implemented
+- ✅ **Linear Progression**: Add weight each session/week with optional caps
+  - Configurable increment amount
+  - Optional weight cap
+  - Per-session or per-week frequency
+- ✅ **Double Progression**: Increase reps within range, then add weight
+  - Min/max rep ranges
+  - Weight increment when max reps achieved
+- ✅ **Top Set + Back-off**: Heavy top set followed by lighter volume sets
+  - Configurable top set and back-off set/rep schemes
+  - Percentage-based or fixed weight reduction
+- ✅ **RPE Target**: Auto-regulation based on Rate of Perceived Exertion
+  - Target RPE with tolerance
+  - Auto-adjust weight based on RPE feedback
+- ✅ **Planned Deload**: Scheduled recovery weeks
+  - Frequency in weeks (1-12)
+  - Deload percentage
+- ✅ **Weekly Undulation**: Rotating intensity days
+  - Heavy/Medium/Light day percentages
+- ✅ **Custom Warm-up**: Specific warm-up set protocols
+  - Multiple warm-up sets with reps and percentages
+
+### Advanced Features
+- ✅ **Miss Handling**: Auto-adjustment on failed sets
+  - Reduce weight by specified amount
+  - Trigger deload protocol
+  - Maintain weight
+- ✅ Comprehensive form validation for all rule types
+- ✅ Real-time rule preview with summaries
+- ✅ Add/remove multiple rules per exercise
+- ✅ Rules stored as JSON in program_day_exercises table
+
+## 🚧 Next Steps (Not Yet Implemented)
 
 ### Phase 6: PWA & Offline Support
 1. Create service worker with:
