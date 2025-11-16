@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: workset-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - workset
+    depends_on:
+      - mysql
+      - redis
+      - meilisearch
+
+  nginx:
+    image: nginx:alpine
+    container_name: workset-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx:/etc/nginx/conf.d
+      - ./docker/nginx/certs:/etc/nginx/certs
+    networks:
+      - workset
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0
+    container_name: workset-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: workset
+      MYSQL_USER: workset
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - workset
+
+  redis:
+    image: redis:7-alpine
+    container_name: workset-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - workset
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: workset-meilisearch
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: true
+    volumes:
+      - meilisearch_data:/meili_data
+    networks:
+      - workset
+
+  horizon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: workset-horizon
+    restart: unless-stopped
+    command: php artisan horizon
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - workset
+    depends_on:
+      - mysql
+      - redis
+
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: workset-reverb
+    restart: unless-stopped
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    working_dir: /var/www/html
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/www/html
+    networks:
+      - workset
+    depends_on:
+      - mysql
+      - redis
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: workset-scheduler
+    restart: unless-stopped
+    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - workset
+    depends_on:
+      - mysql
+      - redis
+
+networks:
+  workset:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  meilisearch_data:
+    driver: local
