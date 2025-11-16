@@ -16,35 +16,25 @@ class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
+     *
+     * Note: Direct registration is disabled. Users must be invited.
      */
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('auth.register');
+        return to_route('login')
+            ->with('info', 'Registration is by invitation only. Please contact an administrator.');
     }
 
     /**
      * Handle an incoming registration request.
      *
+     * Note: Direct registration is disabled. Users must be invited.
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+        return to_route('login')
+            ->with('info', 'Registration is by invitation only. Please contact an administrator.');
     }
 }
