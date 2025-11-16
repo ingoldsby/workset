@@ -10,6 +10,7 @@ RUN apk add --no-cache \
     oniguruma-dev \
     libxml2-dev \
     libzip-dev \
+    icu-dev \
     zip \
     unzip \
     mysql-client \
@@ -25,7 +26,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         pcntl \
         bcmath \
         gd \
-        zip
+        zip \
+        intl
 
 # Install Redis extension
 RUN apk add --no-cache pcre-dev $PHPIZE_DEPS \
