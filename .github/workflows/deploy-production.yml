@@ -1,0 +1,135 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      image-tag:
+        description: 'Docker image tag to deploy (e.g., main, main-abc1234)'
+        required: true
+        default: 'main'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://tracker.kneebone.com.au
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create deployment backup
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            cd /var/www/workset
+
+            # Create pre-deployment backup
+            DATE=$(date +%Y%m%d_%H%M%S)
+            BACKUP_DIR="/var/backups/workset/pre-deployment"
+            mkdir -p $BACKUP_DIR
+
+            # Backup database
+            docker-compose exec -T mysql mysqldump -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} workset \
+              | gzip > "$BACKUP_DIR/workset_pre_deploy_${DATE}.sql.gz"
+
+            echo "✅ Pre-deployment backup created: workset_pre_deploy_${DATE}.sql.gz"
+
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            cd /var/www/workset
+
+            # Pull latest code
+            git fetch origin
+            git checkout main
+            git pull origin main
+
+            # Pull specified Docker image
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.image-tag }}
+
+            # Tag as production
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.image-tag }} \
+              ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:production
+
+            # Enable maintenance mode
+            docker-compose exec -T app php artisan down --retry=60 --secret="${{ secrets.MAINTENANCE_SECRET }}"
+
+            # Stop services (except database and redis)
+            docker-compose stop app nginx horizon reverb scheduler
+
+            # Run migrations
+            docker-compose run --rm app php artisan migrate --force
+
+            # Start services
+            docker-compose up -d
+
+            # Clear caches
+            docker-compose exec -T app php artisan config:cache
+            docker-compose exec -T app php artisan route:cache
+            docker-compose exec -T app php artisan view:cache
+            docker-compose exec -T app php artisan event:cache
+
+            # Rebuild Scout indexes (in background)
+            docker-compose exec -T app php artisan scout:flush "App\Models\Exercise" &
+            docker-compose exec -T app php artisan scout:import "App\Models\Exercise" &
+
+            # Restart Horizon
+            docker-compose exec -T app php artisan horizon:terminate
+
+            # Restart Reverb
+            docker-compose restart reverb
+
+            # Disable maintenance mode
+            docker-compose exec -T app php artisan up
+
+            # Health check
+            sleep 15
+            curl -f https://tracker.kneebone.com.au/health || exit 1
+
+            echo "✅ Production deployment successful"
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Production deployment successful for image tag: ${{ github.event.inputs.image-tag }}"
+          else
+            echo "❌ Production deployment failed for image tag: ${{ github.event.inputs.image-tag }}"
+            echo "⚠️  Database backup available in /var/backups/workset/pre-deployment/"
+            exit 1
+          fi
+
+      - name: Post-deployment verification
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            cd /var/www/workset
+
+            # Check all services are running
+            docker-compose ps
+
+            # Check Horizon status
+            docker-compose exec -T app php artisan horizon:status
+
+            # Check queue workers
+            docker-compose exec -T app php artisan queue:monitor redis:default,redis:notifications
+
+            echo "✅ Post-deployment verification complete"

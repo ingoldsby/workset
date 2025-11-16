@@ -5,14 +5,29 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return redirect()->route('today.index');
+})->middleware(['auth', 'verified']);
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Offline page (accessible without auth for PWA)
+Route::get('/offline', fn () => view('offline'))->name('offline');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Main app sections
+    Route::get('/today', fn () => view('today.index'))->name('today.index');
+    Route::get('/plan', fn () => view('plan.index'))->name('plan.index');
+    Route::get('/log', fn () => view('log.index'))->name('log.index');
+    Route::get('/programs', fn () => view('programs.index'))->name('programs.index');
+    Route::get('/programs/progression-builder', fn () => view('programs.progression-builder'))->name('programs.progressionBuilder');
+    Route::get('/exercises', fn () => view('exercises.index'))->name('exercises.index');
+    Route::get('/history', fn () => view('history.index'))->name('history.index');
+    Route::get('/analytics', fn () => view('analytics.index'))->name('analytics.index');
+
+    // PT-only area
+    Route::middleware('can:viewPtArea,App\Models\User')->group(function () {
+        Route::get('/pt', fn () => view('pt.index'))->name('pt.index');
+    });
+
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

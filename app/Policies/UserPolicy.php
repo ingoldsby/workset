@@ -63,4 +63,9 @@ class UserPolicy
     {
         return $user->isAdmin();
     }
+
+    public function viewPtArea(User $user): bool
+    {
+        return $user->isAdmin() || $user->isPt();
+    }
 }
