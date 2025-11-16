@@ -205,19 +205,81 @@ Comprehensive form-based progression rule system implemented:
 - ✅ Add/remove multiple rules per exercise
 - ✅ Rules stored as JSON in program_day_exercises table
 
+## ✅ Phase 6: PWA & Offline Support (COMPLETE)
+Full Progressive Web App implementation with offline capabilities:
+
+### Core PWA Features
+- ✅ Web app manifest.json with app metadata and icons
+- ✅ Service worker with comprehensive caching strategies
+- ✅ Offline page with helpful messaging
+- ✅ PWA registration script with update detection
+- ✅ Apple mobile web app meta tags for iOS support
+
+### Caching Strategies
+- ✅ **Cache-first**: App shell, static assets, exercise library
+  - Instant loading from cache
+  - Background updates for freshness
+- ✅ **Stale-while-revalidate**: Dynamic content (programs, sessions, history)
+  - Immediate response from cache
+  - Background update and cache refresh
+- ✅ **Network-first**: Authentication, Livewire, real-time data
+  - Always try network first
+  - Fallback to cache when offline
+
+### Offline Functionality
+- ✅ **Background Sync**: Automatic synchronisation when back online
+  - Session sets logged offline sync automatically
+  - Session completion syncs on reconnect
+  - IndexedDB for offline data storage
+- ✅ **Offline Detection**: Visual indicators for connection status
+  - Toast notifications for online/offline transitions
+  - Automatic sync trigger when reconnecting
+- ✅ **Offline Scope**: Exercise library + current sessions accessible offline
+
+### Web Push Notifications
+- ✅ **VAPID Integration**: Web push notification support
+  - Public/private key configuration
+  - Subscription management via API
+  - Push notification event handling
+- ✅ **Just-in-time Permissions**: Smart permission requests
+  - Custom permission prompt UI
+  - Delayed request (5 seconds after registration)
+  - Graceful handling of denied permissions
+- ✅ **Notification Actions**: Click handling and navigation
+  - Focus existing windows when available
+  - Open new windows for notifications
+  - Customizable notification actions
+
+### Install Experience
+- ✅ **Custom Install Prompt**: Branded install experience
+  - Delayed prompt (30 seconds after load)
+  - Custom UI matching app design
+  - Dismissible with "Not now" option
+- ✅ **App Shortcuts**: Quick actions from home screen
+  - Log Session shortcut
+  - View History shortcut
+  - Analytics shortcut
+- ✅ **Standalone Mode Detection**: PWA-specific UI adjustments
+  - Hide install prompt when already installed
+  - Detect display mode (standalone/browser)
+
+### Update Management
+- ✅ **Auto-update Detection**: Notify users of new versions
+  - Hourly update checks
+  - Visual update notification
+  - One-click reload to update
+- ✅ **Cache Versioning**: Clean old caches automatically
+  - Version-based cache naming
+  - Automatic cleanup on activation
+
+### API Endpoints
+- ✅ `/api/push/vapid-public-key` - Get VAPID public key
+- ✅ `/api/push/subscribe` - Subscribe to push notifications
+- ✅ `/api/push/unsubscribe` - Unsubscribe from notifications
+- ✅ `/api/session-sets` - Sync offline session sets
+- ✅ `/api/sessions/{id}/complete` - Sync session completion
+
 ## 🚧 Next Steps (Not Yet Implemented)
-
-### Phase 6: PWA & Offline Support
-1. Create service worker with:
-   - Cache-first for shell + exercise library
-   - Stale-while-revalidate for lists
-   - Background sync for set saves/completions
-   - Smart merge on conflicts
-
-2. Create manifest.json
-3. Implement Web Push (VAPID)
-4. Just-in-time permission requests
-5. Offline scope: exercise library + current week + last 30 days
 
 ### Phase 7: Notifications
 1. Email notifications (SES):

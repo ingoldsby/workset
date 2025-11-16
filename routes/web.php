@@ -8,6 +8,9 @@ Route::get('/', function () {
     return redirect()->route('today.index');
 })->middleware(['auth', 'verified']);
 
+// Offline page (accessible without auth for PWA)
+Route::get('/offline', fn () => view('offline'))->name('offline');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Main app sections
     Route::get('/today', fn () => view('today.index'))->name('today.index');
