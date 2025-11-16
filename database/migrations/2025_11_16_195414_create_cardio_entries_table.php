@@ -6,22 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('cardio_entries', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('training_session_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('cardio_type');
+            $table->date('entry_date');
+            $table->unsignedInteger('duration_seconds')->nullable();
+            $table->decimal('distance', 8, 2)->nullable();
+            $table->string('distance_unit')->nullable();
+            $table->unsignedSmallInteger('avg_heart_rate')->nullable();
+            $table->unsignedSmallInteger('max_heart_rate')->nullable();
+            $table->unsignedInteger('calories_burned')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
-        });
-    }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('cardio_entries');
+            $table->index(['user_id', 'entry_date']);
+            $table->index('training_session_id');
+        });
     }
 };

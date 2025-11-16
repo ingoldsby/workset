@@ -6,22 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('program_days', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('program_version_id')->constrained()->cascadeOnDelete();
+            $table->unsignedSmallInteger('day_number');
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->unsignedSmallInteger('rest_days_after')->default(0);
             $table->timestamps();
-        });
-    }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('program_days');
+            $table->unique(['program_version_id', 'day_number']);
+            $table->index('program_version_id');
+        });
     }
 };
