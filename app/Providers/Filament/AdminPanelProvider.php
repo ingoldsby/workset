@@ -53,6 +53,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->authGuard('web')
+            ->userMenuItems([
+                'profile' => false,
+            ])
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }
