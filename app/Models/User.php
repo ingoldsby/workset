@@ -34,6 +34,7 @@ class User extends Authenticatable implements FilamentUser
         'dumbbell_pair_mode',
         'completed_onboarding',
         'onboarded_at',
+        'notification_preferences',
     ];
 
     protected $hidden = [
@@ -53,6 +54,7 @@ class User extends Authenticatable implements FilamentUser
             'dumbbell_pair_mode' => 'boolean',
             'completed_onboarding' => 'boolean',
             'onboarded_at' => 'datetime',
+            'notification_preferences' => 'array',
         ];
     }
 

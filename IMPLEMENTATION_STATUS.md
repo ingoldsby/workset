@@ -279,18 +279,78 @@ Full Progressive Web App implementation with offline capabilities:
 - ✅ `/api/session-sets` - Sync offline session sets
 - ✅ `/api/sessions/{id}/complete` - Sync session completion
 
+## ✅ Phase 7: Notifications (COMPLETE)
+Comprehensive notification system with email and web push notifications:
+
+### Email Notifications
+- ✅ **InviteCreated**: Welcome email when user receives an invitation
+  - Personalised greeting from inviter
+  - Accept invitation link with expiry information
+  - Professional email template
+- ✅ **PtDailyDigest**: Daily summary for PTs at 20:00 local time
+  - Completed sessions from assigned athletes
+  - Upcoming sessions for next day
+  - Missed sessions requiring attention
+  - Sent only if there's activity to report
+- ✅ **MemberWeeklyDigest**: Weekly training summary for members
+  - Past week's session count and stats
+  - Total sets and volume lifted
+  - Upcoming week's scheduled sessions
+  - User-configurable delivery day
+- ✅ **PtActivityAlert**: Email notification for significant PT events
+  - Notifies PT when sessions logged on their behalf
+  - Includes session details and stats
+
+### Web Push Notifications
+- ✅ **SessionReminder**: Push notification before scheduled sessions
+  - Sent 1 hour before scheduled session
+  - Shows session name and type
+  - Click-to-navigate to Today view
+  - User-configurable (can disable)
+- ✅ **PtActivityAlert**: Real-time athlete activity notifications
+  - Session completion alerts
+  - Click-to-navigate to PT dashboard
+  - User-configurable (can disable)
+
+### Notification Preferences
+- ✅ **NotificationPreferences Livewire Component**
+  - Session reminders (web push) toggle
+  - PT activity alerts toggle (for PTs/Admins)
+  - PT daily digest toggle (for PTs/Admins)
+  - Member weekly digest toggle
+  - Weekly digest day selection (7 days)
+  - Integrated into profile settings
+  - Saves preferences to user.notification_preferences JSON column
+
+### Scheduled Commands
+- ✅ **SendPtDailyDigests**: Send PT daily digests
+  - Command: `workset:send-pt-daily-digests`
+  - Runs at 20:00 local time
+  - Filters PTs who enabled daily digest
+  - Only sends if there's activity
+- ✅ **SendMemberWeeklyDigests**: Send member weekly summaries
+  - Command: `workset:send-member-weekly-digests`
+  - Accepts --day option for specific day
+  - Respects user's chosen delivery day
+  - Includes past week stats and upcoming plan
+- ✅ **SendSessionReminders**: Send session reminder push notifications
+  - Command: `workset:send-session-reminders`
+  - Runs every 10 minutes
+  - Sends reminders 1 hour before sessions
+  - Prevents duplicate reminders
+  - Respects user's notification preferences
+
+### Database Integration
+- ✅ Added `notification_preferences` JSON column to users table
+- ✅ Added `reminder_sent_at` tracking to session_plans table
+- ✅ Cast notification_preferences as array in User model
+
+### Queue Support
+- ✅ All notifications implement ShouldQueue
+- ✅ Queued processing for better performance
+- ✅ Failed job handling via Laravel Horizon
+
 ## 🚧 Next Steps (Not Yet Implemented)
-
-### Phase 7: Notifications
-1. Email notifications (SES):
-   - Invite emails
-   - PT daily digest (20:00 local)
-   - Member weekly digest (user-selected)
-   - PT logs on behalf notice
-
-2. Web Push notifications:
-   - Session reminders (user-configurable)
-   - PT activity alerts
 
 ### Phase 8: Exercise Library Seeding
 1. Create wger API integration
