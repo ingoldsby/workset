@@ -5,11 +5,11 @@ RUN apk add --no-cache \
     git \
     curl \
     libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
     oniguruma-dev \
     libxml2-dev \
     libzip-dev \
-    libcurl \
-    curl-dev \
     zip \
     unzip \
     mysql-client \
@@ -17,7 +17,15 @@ RUN apk add --no-cache \
     npm
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd curl zip
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_mysql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip
 
 # Install Redis extension
 RUN apk add --no-cache pcre-dev $PHPIZE_DEPS \
@@ -39,6 +47,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 
 # Copy application files
 COPY . .
+
+# Create required directories if they don't exist
+RUN mkdir -p storage/framework/{sessions,views,cache} \
+    && mkdir -p storage/logs \
+    && mkdir -p bootstrap/cache
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
