@@ -6,22 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('analytics_snapshots', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
+            $table->ulid('user_id');
+            $table->string('snapshot_type');
+            $table->date('snapshot_date');
+            $table->json('data');
             $table->timestamps();
-        });
-    }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('analytics_snapshots');
+            $table->index(['user_id', 'snapshot_type', 'snapshot_date']);
+            $table->index('snapshot_date');
+        });
     }
 };
