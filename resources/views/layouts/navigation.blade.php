@@ -12,9 +12,32 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    <x-nav-link :href="route('today.index')" :active="request()->routeIs('today.*')">
+                        {{ __('Today') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('plan.index')" :active="request()->routeIs('plan.*')">
+                        {{ __('Plan') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('log.index')" :active="request()->routeIs('log.*')">
+                        {{ __('Log') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('programs.index')" :active="request()->routeIs('programs.*')">
+                        {{ __('Programs') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('exercises.index')" :active="request()->routeIs('exercises.*')">
+                        {{ __('Exercises') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('history.index')" :active="request()->routeIs('history.*')">
+                        {{ __('History') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('analytics.index')" :active="request()->routeIs('analytics.*')">
+                        {{ __('Analytics') }}
+                    </x-nav-link>
+                    @can('viewPtArea', Auth::user())
+                        <x-nav-link :href="route('pt.index')" :active="request()->routeIs('pt.*')">
+                            {{ __('PT Area') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -67,9 +90,32 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+            <x-responsive-nav-link :href="route('today.index')" :active="request()->routeIs('today.*')">
+                {{ __('Today') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('plan.index')" :active="request()->routeIs('plan.*')">
+                {{ __('Plan') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('log.index')" :active="request()->routeIs('log.*')">
+                {{ __('Log') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('programs.index')" :active="request()->routeIs('programs.*')">
+                {{ __('Programs') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('exercises.index')" :active="request()->routeIs('exercises.*')">
+                {{ __('Exercises') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('history.index')" :active="request()->routeIs('history.*')">
+                {{ __('History') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('analytics.index')" :active="request()->routeIs('analytics.*')">
+                {{ __('Analytics') }}
+            </x-responsive-nav-link>
+            @can('viewPtArea', Auth::user())
+                <x-responsive-nav-link :href="route('pt.index')" :active="request()->routeIs('pt.*')">
+                    {{ __('PT Area') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->
