@@ -74,6 +74,9 @@ describe('SendInviteAction', function () {
             expiryDays: 14,
         );
 
-        expect($invite->expires_at->diffInDays(now(), absolute: true))->toBe(14);
+        $expectedDate = now()->addDays(14)->startOfDay();
+        $actualDate = $invite->expires_at->startOfDay();
+
+        expect($actualDate->equalTo($expectedDate))->toBeTrue();
     });
 });

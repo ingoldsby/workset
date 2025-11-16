@@ -70,13 +70,22 @@ class InviteController extends Controller
 
     public function resend(Request $request, Invite $invite, SendInviteAction $action): RedirectResponse
     {
-        $this->authorize('resend', $invite);
+        // Check basic authorization first (user can manage invites)
+        if (! $request->user()->role->canInvite()) {
+            abort(403);
+        }
 
+        // Check ownership
+        if (! $request->user()->isAdmin() && $invite->invited_by !== $request->user()->id) {
+            abort(403);
+        }
+
+        // Check if invite can be resent
         if (! $invite->isPending()) {
             return back()->with('error', 'This invitation cannot be resent');
         }
 
-        // Update expiry and regenerate token
+        // Update expiry
         $invite->update([
             'expires_at' => now()->addDays(7),
         ]);
