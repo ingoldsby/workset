@@ -350,14 +350,67 @@ Comprehensive notification system with email and web push notifications:
 - ✅ Queued processing for better performance
 - ✅ Failed job handling via Laravel Horizon
 
-## 🚧 Next Steps (Not Yet Implemented)
+## ✅ Phase 8: Exercise Library Seeding (COMPLETE)
+Full integration with wger.de API for global exercise library:
 
-### Phase 8: Exercise Library Seeding
-1. Create wger API integration
-2. One-time snapshot import (en-AU preferred)
-3. Map equipment variants
-4. Store wger_id for reference
-5. Admin-only editing of global exercises
+### Core Services
+- ✅ **WgerApiService**: Complete wger.de API client
+  - Paginated exercise fetching with rate limiting
+  - Equipment and muscle data retrieval
+  - Exercise image downloading
+  - Retry logic and error handling
+  - Configurable language support (default: English)
+- ✅ **WgerEquipmentMapper**: Equipment ID to EquipmentType enum mapping
+  - Maps wger equipment IDs to our enum values
+  - Determines primary equipment from multiple options
+  - Extracts equipment variants
+  - Handles bodyweight exercises
+- ✅ **WgerMuscleMapper**: Muscle ID to MuscleGroup enum mapping
+  - Maps wger muscle IDs to our enum values
+  - Determines primary muscle group
+  - Extracts secondary muscles
+  - Handles muscle group combinations
+
+### Data Transformation
+- ✅ **WgerExerciseTransformer**: Converts wger data to Exercise model
+  - Cleans HTML descriptions from wger
+  - Maps equipment and muscles using mapper services
+  - Determines exercise mechanics (compound/isolation)
+  - Determines exercise category
+  - Builds aliases array
+  - Quality filtering (excludes incomplete/placeholder exercises)
+  - Batch transformation support
+
+### Import Command
+- ✅ **ImportExercisesFromWger** (`workset:import-exercises`)
+  - Options:
+    - `--limit=100`: Exercises per page
+    - `--max=`: Maximum exercises to import
+    - `--fresh`: Delete existing exercises first
+    - `--images`: Download exercise images
+    - `--language=2`: wger language ID
+  - Progress tracking with progress bar
+  - Comprehensive error handling
+  - Transaction-based imports
+  - Update existing exercises by wger_id
+  - Image downloading with local storage
+  - Summary statistics (imported, skipped, failed, images)
+  - Full logging support
+
+### Database Enhancements
+- ✅ Added `image_url` and `thumbnail_url` columns to exercises table
+- ✅ Updated Exercise model with new fillable fields
+- ✅ Migration for image columns
+
+### Features
+- ✅ Deduplicate exercises by wger_id
+- ✅ Update existing exercises on re-import
+- ✅ Rate limiting to respect wger API
+- ✅ Quality filtering to avoid low-quality exercises
+- ✅ Image storage in public disk
+- ✅ Comprehensive import reporting
+
+## 🚧 Next Steps (Not Yet Implemented)
 
 ### Phase 9: CI/CD & Deployment
 1. GitHub Actions workflow:
@@ -404,7 +457,7 @@ Write Pest tests for:
 4. Configure database & services
 5. Run migrations: `php artisan migrate`
 6. Seed first admin: `php artisan db:seed --class=AdminSeeder`
-7. Seed exercise library: `php artisan workset:seed-exercises`
+7. Seed exercise library: `php artisan workset:import-exercises --images`
 
 ### Docker Commands
 ```bash

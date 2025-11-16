@@ -30,6 +30,8 @@ class Exercise extends Model
         'aliases',
         'wger_id',
         'language',
+        'image_url',
+        'thumbnail_url',
     ];
 
     protected function casts(): array
