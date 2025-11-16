@@ -410,22 +410,123 @@ Full integration with wger.de API for global exercise library:
 - ✅ Image storage in public disk
 - ✅ Comprehensive import reporting
 
+## ✅ Phase 9: CI/CD & Deployment (COMPLETE)
+Comprehensive automated deployment pipeline with backup and restore capabilities:
+
+### GitHub Actions Workflows
+- ✅ **CI/CD Pipeline** (`.github/workflows/ci-cd.yml`)
+  - Multi-arch Docker image builds (amd64/arm64)
+  - Push to GitHub Container Registry
+  - Automatic staging deployment on merge to main
+  - Buildx cache optimisation
+  - Health check verification
+
+- ✅ **Production Deployment** (`.github/workflows/deploy-production.yml`)
+  - Manual workflow dispatch with approval gate
+  - Selectable image tag deployment
+  - Pre-deployment database backup
+  - Maintenance mode during deployment
+  - Post-deployment health verification
+  - Automated rollback on failure
+
+### Deployment Features
+- ✅ **Staging Environment**
+  - Automatic deployment on push to main
+  - SSH-based deployment
+  - Database migrations
+  - Cache clearing and optimisation
+  - Scout index rebuilding
+  - Horizon and Reverb restart
+  - Health check validation
+
+- ✅ **Production Environment**
+  - Manual approval workflow
+  - Pre-deployment backup creation
+  - Graceful maintenance mode
+  - Zero-downtime deployment strategy
+  - Cache optimisation (config, route, view, event)
+  - Service restart orchestration
+  - Comprehensive health checks
+
+### Backup System
+- ✅ **Database Backup Script** (`scripts/backup/backup-database.sh`)
+  - Daily full MySQL dumps
+  - AES-256-CBC encryption
+  - Gzip compression
+  - Upload to DigitalOcean Spaces
+  - 30-day retention policy
+  - Automatic cleanup of old backups
+  - Comprehensive error handling
+
+- ✅ **Binary Log Backup** (`scripts/backup/backup-binlogs.sh`)
+  - Hourly binlog rotation and backup
+  - Point-in-time recovery capability
+  - 7-day retention window
+  - Compressed storage
+  - Spaces upload
+  - Automatic MySQL binlog purging
+
+- ✅ **Restore Script** (`scripts/backup/restore-database.sh`)
+  - Restore from local or Spaces backups
+  - Automatic decryption
+  - Pre-restore backup creation
+  - Post-restore migrations
+  - Cache clearing
+  - Service restart
+
+### Documentation
+- ✅ **Backup & Restore Guide** (`docs/BACKUP_RESTORE.md`)
+  - Complete backup strategy documentation
+  - Step-by-step restore procedures
+  - Point-in-time recovery guide
+  - Disaster recovery scenarios
+  - Security considerations
+  - Monitoring and troubleshooting
+
+- ✅ **Deployment Guide** (`docs/DEPLOYMENT.md`)
+  - CI/CD architecture overview
+  - Deployment workflows
+  - Pre-deployment checklist
+  - Post-deployment verification
+  - Rollback procedures
+  - Maintenance mode management
+  - Database migration strategy
+  - Cache and queue management
+  - Troubleshooting guide
+
+### Helper Scripts
+- ✅ **Health Check Script** (`scripts/deploy/health-check.sh`)
+  - Application health endpoint test
+  - Database connectivity check
+  - Redis connectivity check
+  - Horizon status verification
+  - Reverb service check
+  - Scheduler status
+  - Meilisearch health
+  - Storage permissions
+  - Cache functionality
+  - Queue accessibility
+  - Docker container health
+  - Comprehensive test reporting
+
+### Required GitHub Secrets
+- ✅ Staging environment secrets (host, user, SSH key)
+- ✅ Production environment secrets (host, user, SSH key, maintenance secret)
+- ✅ Database credentials
+- ✅ Backup encryption configuration
+- ✅ DigitalOcean Spaces credentials
+
+### Deployment Capabilities
+- ✅ Multi-architecture Docker builds
+- ✅ Container registry integration
+- ✅ Automated testing gates
+- ✅ Blue-green deployment support
+- ✅ Automatic rollback on failure
+- ✅ Pre-deployment backups
+- ✅ Health monitoring
+- ✅ Service orchestration
+
 ## 🚧 Next Steps (Not Yet Implemented)
-
-### Phase 9: CI/CD & Deployment
-1. GitHub Actions workflow:
-   - Build multi-arch Docker images
-   - Deploy to staging on merge to main
-   - Manual promotion to production
-   - Run migrations
-   - Restart Horizon
-   - Clear caches
-   - Rebuild Scout indexes
-
-2. Backup scripts:
-   - Daily encrypted MySQL dumps → DO Spaces (30-day retention)
-   - MySQL binlog backup (7 days)
-   - Restore documentation
 
 ### Phase 10: Testing
 Write Pest tests for:
@@ -449,6 +550,7 @@ Write Pest tests for:
 - Push: `VAPID_*`
 - Analytics: `FATHOM_SITE_ID`
 - Security: `HCAPTCHA_*`
+- Backups: `BACKUP_ENCRYPTION_KEY`, `DO_SPACES_KEY`, `DO_SPACES_SECRET`, `DO_SPACES_BUCKET`, `DO_SPACES_REGION`
 
 ### First Run
 1. `composer install`
