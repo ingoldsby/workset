@@ -90,3 +90,40 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json($session);
     });
 });
+
+/**
+ * Workout Preferences API Routes
+ */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/users/{user}/workout-preference', [App\Http\Controllers\WorkoutPreferenceController::class, 'show'])
+        ->name('workoutPreference.show');
+
+    Route::post('/workout-preferences', [App\Http\Controllers\WorkoutPreferenceController::class, 'store'])
+        ->name('workoutPreference.store');
+
+    Route::put('/workout-preferences/{workoutPreference}', [App\Http\Controllers\WorkoutPreferenceController::class, 'update'])
+        ->name('workoutPreference.update');
+
+    Route::delete('/workout-preferences/{workoutPreference}', [App\Http\Controllers\WorkoutPreferenceController::class, 'destroy'])
+        ->name('workoutPreference.destroy');
+});
+
+/**
+ * AI Workout Suggestions API Routes
+ */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/ai-workout-suggestions', [App\Http\Controllers\AiWorkoutSuggestionController::class, 'index'])
+        ->name('aiWorkoutSuggestion.index');
+
+    Route::get('/ai-workout-suggestions/{aiWorkoutSuggestion}', [App\Http\Controllers\AiWorkoutSuggestionController::class, 'show'])
+        ->name('aiWorkoutSuggestion.show');
+
+    Route::post('/ai-workout-suggestions/generate', [App\Http\Controllers\AiWorkoutSuggestionController::class, 'generate'])
+        ->name('aiWorkoutSuggestion.generate');
+
+    Route::post('/ai-workout-suggestions/{aiWorkoutSuggestion}/apply', [App\Http\Controllers\AiWorkoutSuggestionController::class, 'markAsApplied'])
+        ->name('aiWorkoutSuggestion.apply');
+
+    Route::delete('/ai-workout-suggestions/{aiWorkoutSuggestion}', [App\Http\Controllers\AiWorkoutSuggestionController::class, 'destroy'])
+        ->name('aiWorkoutSuggestion.destroy');
+});
