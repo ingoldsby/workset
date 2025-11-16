@@ -5,8 +5,11 @@ RUN apk add --no-cache \
     git \
     curl \
     libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
     oniguruma-dev \
     libxml2-dev \
+    libzip-dev \
     zip \
     unzip \
     mysql-client \
@@ -14,7 +17,15 @@ RUN apk add --no-cache \
     npm
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_mysql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip
 
 # Install Redis extension
 RUN apk add --no-cache pcre-dev $PHPIZE_DEPS \
@@ -28,11 +39,19 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application files
-COPY . .
+# Copy composer files first for better layer caching
+COPY composer.json composer.lock ./
 
 # Install dependencies (skip scripts that require Laravel to bootstrap)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Copy application files
+COPY . .
+
+# Create required directories if they don't exist
+RUN mkdir -p storage/framework/{sessions,views,cache} \
+    && mkdir -p storage/logs \
+    && mkdir -p bootstrap/cache
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
