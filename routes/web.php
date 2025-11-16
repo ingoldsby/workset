@@ -12,6 +12,9 @@ Route::get('/', function () {
 Route::get('/offline', fn () => view('offline'))->name('offline');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard alias for compatibility with Breeze tests
+    Route::get('/dashboard', fn () => redirect()->route('today.index'))->name('dashboard');
+
     // Main app sections
     Route::get('/today', fn () => view('today.index'))->name('today.index');
     Route::get('/plan', fn () => view('plan.index'))->name('plan.index');
