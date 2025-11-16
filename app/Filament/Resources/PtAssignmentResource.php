@@ -160,6 +160,12 @@ class PtAssignmentResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['pt', 'member']);
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::whereNull('unassigned_at')->count();

@@ -223,6 +223,12 @@ class InviteResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['inviter', 'personalTrainer']);
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::whereNull('accepted_at')
