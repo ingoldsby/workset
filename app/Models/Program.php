@@ -22,7 +22,20 @@ class Program extends Model
         'name',
         'description',
         'visibility',
+        'is_template',
+        'category',
+        'tags',
+        'install_count',
+        'cloned_from_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_template' => 'boolean',
+            'install_count' => 'integer',
+        ];
+    }
 
     public function owner(): BelongsTo
     {
@@ -32,6 +45,21 @@ class Program extends Model
     public function versions(): HasMany
     {
         return $this->hasMany(ProgramVersion::class);
+    }
+
+    public function shares(): HasMany
+    {
+        return $this->hasMany(ProgramShare::class);
+    }
+
+    public function clonedFrom(): BelongsTo
+    {
+        return $this->belongsTo(Program::class, 'cloned_from_id');
+    }
+
+    public function clones(): HasMany
+    {
+        return $this->hasMany(Program::class, 'cloned_from_id');
     }
 
     public function activeVersion(): ?ProgramVersion
@@ -51,6 +79,25 @@ class Program extends Model
     public function isPrivate(): bool
     {
         return $this->visibility === 'private';
+    }
+
+    public function isTemplate(): bool
+    {
+        return $this->is_template;
+    }
+
+    public function getTagsArray(): array
+    {
+        if (! $this->tags) {
+            return [];
+        }
+
+        return json_decode($this->tags, true) ?? [];
+    }
+
+    public function setTagsArray(array $tags): void
+    {
+        $this->tags = json_encode($tags);
     }
 
     public function toSearchableArray(): array
