@@ -157,7 +157,8 @@ class ProgramResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->with(['owner', 'versions' => fn ($query) => $query->where('is_active', true)]);
     }
 
     public static function getNavigationBadge(): ?string
