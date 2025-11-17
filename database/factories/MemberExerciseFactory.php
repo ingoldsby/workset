@@ -21,16 +21,16 @@ class MemberExerciseFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'name' => fake()->words(3, true),
-            'description' => fake()->paragraph(),
-            'category' => fake()->randomElement(ExerciseCategory::cases()),
-            'primary_muscle' => fake()->randomElement(MuscleGroup::cases()),
-            'secondary_muscles' => fake()->randomElements(
+            'name' => $this->faker->words(3, true),
+            'description' => $this->faker->paragraph(),
+            'category' => $this->faker->randomElement(ExerciseCategory::cases()),
+            'primary_muscle' => $this->faker->randomElement(MuscleGroup::cases()),
+            'secondary_muscles' => $this->faker->randomElements(
                 array_map(fn ($case) => $case->value, MuscleGroup::cases()),
-                fake()->numberBetween(0, 3)
+                $this->faker->numberBetween(0, 3)
             ),
-            'equipment' => fake()->randomElement(EquipmentType::cases()),
-            'mechanics' => fake()->randomElement(ExerciseMechanics::cases()),
+            'equipment' => $this->faker->randomElement(EquipmentType::cases()),
+            'mechanics' => $this->faker->randomElement(ExerciseMechanics::cases()),
         ];
     }
 }

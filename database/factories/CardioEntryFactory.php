@@ -19,14 +19,14 @@ class CardioEntryFactory extends Factory
         return [
             'user_id' => User::factory(),
             'training_session_id' => null,
-            'cardio_type' => fake()->randomElement(CardioType::cases()),
-            'entry_date' => fake()->date(),
-            'duration_seconds' => fake()->numberBetween(600, 3600),
-            'distance' => fake()->randomFloat(2, 1, 20),
+            'cardio_type' => $this->faker->randomElement(CardioType::cases()),
+            'entry_date' => $this->faker->date(),
+            'duration_seconds' => $this->faker->numberBetween(600, 3600),
+            'distance' => $this->faker->randomFloat(2, 1, 20),
             'distance_unit' => 'km',
-            'avg_heart_rate' => fake()->numberBetween(120, 160),
-            'max_heart_rate' => fake()->numberBetween(160, 190),
-            'calories_burned' => fake()->numberBetween(100, 800),
+            'avg_heart_rate' => $this->faker->numberBetween(120, 160),
+            'max_heart_rate' => $this->faker->numberBetween(160, 190),
+            'calories_burned' => $this->faker->numberBetween(100, 800),
             'notes' => null,
         ];
     }

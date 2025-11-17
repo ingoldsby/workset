@@ -26,7 +26,7 @@ class PtAssignmentFactory extends Factory
     public function unassigned(): static
     {
         return $this->state(fn (array $attributes) => [
-            'unassigned_at' => fake()->dateTimeBetween($attributes['assigned_at'], 'now'),
+            'unassigned_at' => $this->faker->dateTimeBetween($attributes['assigned_at'], 'now'),
         ]);
     }
 }

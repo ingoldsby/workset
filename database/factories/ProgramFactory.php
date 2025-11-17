@@ -17,8 +17,8 @@ class ProgramFactory extends Factory
     {
         return [
             'owner_id' => User::factory(),
-            'name' => fake()->words(3, true),
-            'description' => fake()->paragraph(),
+            'name' => $this->faker->words(3, true),
+            'description' => $this->faker->paragraph(),
             'visibility' => 'private',
         ];
     }

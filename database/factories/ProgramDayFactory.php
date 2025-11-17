@@ -17,10 +17,10 @@ class ProgramDayFactory extends Factory
     {
         return [
             'program_version_id' => ProgramVersion::factory(),
-            'day_number' => fake()->numberBetween(1, 7),
-            'name' => fake()->words(2, true),
-            'description' => fake()->sentence(),
-            'rest_days_after' => fake()->numberBetween(0, 2),
+            'day_number' => $this->faker->numberBetween(1, 7),
+            'name' => $this->faker->words(2, true),
+            'description' => $this->faker->sentence(),
+            'rest_days_after' => $this->faker->numberBetween(0, 2),
         ];
     }
 }

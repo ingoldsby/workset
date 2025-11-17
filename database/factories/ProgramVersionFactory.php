@@ -20,7 +20,7 @@ class ProgramVersionFactory extends Factory
             'program_id' => Program::factory(),
             'created_by' => User::factory(),
             'version_number' => 1,
-            'change_notes' => fake()->sentence(),
+            'change_notes' => $this->faker->sentence(),
             'is_active' => true,
         ];
     }

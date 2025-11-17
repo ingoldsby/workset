@@ -20,7 +20,7 @@ class TrainingSessionFactory extends Factory
             'user_id' => User::factory(),
             'session_plan_id' => SessionPlan::factory(),
             'logged_by' => null,
-            'scheduled_date' => fake()->date(),
+            'scheduled_date' => $this->faker->date(),
             'started_at' => null,
             'completed_at' => null,
             'notes' => null,
@@ -30,14 +30,14 @@ class TrainingSessionFactory extends Factory
     public function inProgress(): static
     {
         return $this->state(fn (array $attributes) => [
-            'started_at' => fake()->dateTimeBetween('-2 hours', 'now'),
+            'started_at' => $this->faker->dateTimeBetween('-2 hours', 'now'),
         ]);
     }
 
     public function completed(): static
     {
-        $startedAt = fake()->dateTimeBetween('-7 days', '-1 hour');
-        $completedAt = fake()->dateTimeBetween($startedAt, 'now');
+        $startedAt = $this->faker->dateTimeBetween('-7 days', '-1 hour');
+        $completedAt = $this->faker->dateTimeBetween($startedAt, 'now');
 
         return $this->state(fn (array $attributes) => [
             'started_at' => $startedAt,

@@ -20,7 +20,7 @@ class SessionExerciseFactory extends Factory
             'training_session_id' => TrainingSession::factory(),
             'exercise_id' => Exercise::factory(),
             'member_exercise_id' => null,
-            'order' => fake()->numberBetween(1, 10),
+            'order' => $this->faker->numberBetween(1, 10),
             'superset_group' => null,
             'notes' => null,
         ];
