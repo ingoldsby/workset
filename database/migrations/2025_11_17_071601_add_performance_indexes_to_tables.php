@@ -75,16 +75,14 @@ return new class extends Migration
         });
 
         // Indexes for member_exercises table
-        Schema::table('member_exercises', function (Blueprint $table) {
-            // Filter member's custom exercises
-            $table->index(['user_id', 'is_active']);
-            $table->index(['user_id', 'exercise_id']);
-        });
+        // Note: index on ['user_id', 'name'] already exists from create table migration
+        // Table does not have is_active or exercise_id columns
+        // No additional indexes needed
 
         // Indexes for cardio_entries table
         Schema::table('cardio_entries', function (Blueprint $table) {
-            // Fetch cardio entries for a session
-            $table->index('session_id');
+            // Index on training_session_id already exists from create table migration
+            // Index on ['user_id', 'entry_date'] already exists from create table migration
             $table->index(['user_id', 'created_at']);
         });
 
@@ -96,16 +94,15 @@ return new class extends Migration
 
         // Indexes for audit_logs table
         Schema::table('audit_logs', function (Blueprint $table) {
-            // Query audit logs (auditable_type + auditable_id and user_id already exist)
+            // Indexes on auditable_type+auditable_id, user_id, event, created_at already exist
+            // Combined index for filtering user's recent logs
             $table->index(['user_id', 'created_at']);
-            $table->index('action');
         });
 
         // Indexes for recycle_bin table
         Schema::table('recycle_bin', function (Blueprint $table) {
-            // Query deleted items
-            $table->index(['original_table', 'original_id']);
-            $table->index('deleted_by');
+            // Indexes on recyclable_type+recyclable_id, user_id, expires_at already exist
+            // Add index for filtering by deleted_at timestamp
             $table->index('deleted_at');
         });
     }
