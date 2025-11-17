@@ -41,10 +41,10 @@ services:
     container_name: workset-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: workset
-      MYSQL_USER: workset
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: root_secret
+      MYSQL_DATABASE: ${DB_DATABASE:-workset}
+      MYSQL_USER: ${DB_USERNAME:-workset}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret}
     # ports:
     #   - "3306:3306"  # Commented out for production - app connects via Docker network
     volumes:
