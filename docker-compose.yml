@@ -42,8 +42,8 @@ services:
       MYSQL_USER: workset
       MYSQL_PASSWORD: secret
       MYSQL_ROOT_PASSWORD: root_secret
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306"  # Commented out for production - app connects via Docker network
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -53,8 +53,8 @@ services:
     image: redis:7-alpine
     container_name: workset-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    # ports:
+    #   - "6379:6379"  # Commented out for production - app connects via Docker network
     volumes:
       - redis_data:/data
     networks:
@@ -64,10 +64,10 @@ services:
     image: getmeili/meilisearch:latest
     container_name: workset-meilisearch
     restart: unless-stopped
-    ports:
-      - "7700:7700"
+    # ports:
+    #   - "7700:7700"  # Commented out for production - app connects via Docker network
     environment:
-      MEILI_ENV: development
+      MEILI_ENV: production
       MEILI_NO_ANALYTICS: true
     volumes:
       - meilisearch_data:/meili_data
