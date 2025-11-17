@@ -18,7 +18,7 @@ class InviteFactory extends Factory
     public function definition(): array
     {
         return [
-            'email' => fake()->unique()->safeEmail(),
+            'email' => $this->faker->unique()->safeEmail(),
             'token' => Str::random(32),
             'invited_by' => User::factory(),
             'pt_id' => null,
@@ -38,14 +38,14 @@ class InviteFactory extends Factory
     public function accepted(): static
     {
         return $this->state(fn (array $attributes) => [
-            'accepted_at' => fake()->dateTimeBetween('-30 days', 'now'),
+            'accepted_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
         ]);
     }
 
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
-            'expires_at' => fake()->dateTimeBetween('-60 days', '-1 day'),
+            'expires_at' => $this->faker->dateTimeBetween('-60 days', '-1 day'),
         ]);
     }
 

@@ -20,8 +20,8 @@ class SessionPlanFactory extends Factory
             'program_day_id' => ProgramDay::factory(),
             'user_id' => User::factory(),
             'created_by' => User::factory(),
-            'name' => fake()->words(3, true),
-            'notes' => fake()->sentence(),
+            'name' => $this->faker->words(3, true),
+            'notes' => $this->faker->sentence(),
         ];
     }
 }

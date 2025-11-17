@@ -20,18 +20,18 @@ class ExerciseFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(3, true),
-            'description' => fake()->paragraph(),
-            'category' => fake()->randomElement(ExerciseCategory::cases()),
-            'primary_muscle' => fake()->randomElement(MuscleGroup::cases()),
-            'secondary_muscles' => fake()->randomElements(
+            'name' => $this->faker->words(3, true),
+            'description' => $this->faker->paragraph(),
+            'category' => $this->faker->randomElement(ExerciseCategory::cases()),
+            'primary_muscle' => $this->faker->randomElement(MuscleGroup::cases()),
+            'secondary_muscles' => $this->faker->randomElements(
                 array_map(fn ($case) => $case->value, MuscleGroup::cases()),
-                fake()->numberBetween(0, 3)
+                $this->faker->numberBetween(0, 3)
             ),
-            'equipment' => fake()->randomElement(EquipmentType::cases()),
+            'equipment' => $this->faker->randomElement(EquipmentType::cases()),
             'equipment_variants' => null,
-            'mechanics' => fake()->randomElement(ExerciseMechanics::cases()),
-            'level' => fake()->randomElement(ExerciseLevel::cases()),
+            'mechanics' => $this->faker->randomElement(ExerciseMechanics::cases()),
+            'level' => $this->faker->randomElement(ExerciseLevel::cases()),
             'aliases' => null,
             'wger_id' => null,
             'language' => 'en-AU',
@@ -41,7 +41,7 @@ class ExerciseFactory extends Factory
     public function fromWger(): static
     {
         return $this->state(fn (array $attributes) => [
-            'wger_id' => fake()->unique()->numberBetween(1, 10000),
+            'wger_id' => $this->faker->unique()->numberBetween(1, 10000),
         ]);
     }
 }

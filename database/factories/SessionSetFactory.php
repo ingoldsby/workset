@@ -16,16 +16,16 @@ class SessionSetFactory extends Factory
 
     public function definition(): array
     {
-        $prescribedReps = fake()->numberBetween(6, 12);
-        $prescribedWeight = fake()->randomFloat(2, 20, 100);
+        $prescribedReps = $this->faker->numberBetween(6, 12);
+        $prescribedWeight = $this->faker->randomFloat(2, 20, 100);
 
         return [
             'session_exercise_id' => SessionExercise::factory(),
-            'set_number' => fake()->numberBetween(1, 5),
+            'set_number' => $this->faker->numberBetween(1, 5),
             'set_type' => SetType::Normal,
             'prescribed_reps' => $prescribedReps,
             'prescribed_weight' => $prescribedWeight,
-            'prescribed_rpe' => fake()->numberBetween(7, 9),
+            'prescribed_rpe' => $this->faker->numberBetween(7, 9),
             'performed_reps' => null,
             'performed_weight' => null,
             'performed_rpe' => null,
@@ -41,14 +41,14 @@ class SessionSetFactory extends Factory
     public function completed(): static
     {
         return $this->state(function (array $attributes) {
-            $performedReps = $attributes['prescribed_reps'] + fake()->numberBetween(-2, 2);
+            $performedReps = $attributes['prescribed_reps'] + $this->faker->numberBetween(-2, 2);
             $performedWeight = $attributes['prescribed_weight'];
             $asPreescribed = $performedReps === $attributes['prescribed_reps'];
 
             return [
                 'performed_reps' => max(1, $performedReps),
                 'performed_weight' => $performedWeight,
-                'performed_rpe' => fake()->numberBetween(7, 9),
+                'performed_rpe' => $this->faker->numberBetween(7, 9),
                 'completed' => true,
                 'completed_as_prescribed' => $asPreescribed,
                 'completed_at' => now(),

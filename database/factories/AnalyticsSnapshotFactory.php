@@ -17,12 +17,12 @@ class AnalyticsSnapshotFactory extends Factory
     {
         return [
             'user_id' => User::factory()->create()->id,
-            'snapshot_type' => fake()->randomElement(['weekly', 'monthly', 'yearly']),
-            'snapshot_date' => fake()->date(),
+            'snapshot_type' => $this->faker->randomElement(['weekly', 'monthly', 'yearly']),
+            'snapshot_date' => $this->faker->date(),
             'data' => [
-                'total_sessions' => fake()->numberBetween(1, 50),
-                'total_volume' => fake()->numberBetween(1000, 50000),
-                'avg_session_duration' => fake()->numberBetween(30, 120),
+                'total_sessions' => $this->faker->numberBetween(1, 50),
+                'total_volume' => $this->faker->numberBetween(1000, 50000),
+                'avg_session_duration' => $this->faker->numberBetween(30, 120),
             ],
         ];
     }

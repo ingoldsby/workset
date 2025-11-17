@@ -17,13 +17,13 @@ class AuditLogFactory extends Factory
     {
         return [
             'user_id' => User::factory()->create()->id,
-            'event' => fake()->randomElement(['created', 'updated', 'deleted']),
+            'event' => $this->faker->randomElement(['created', 'updated', 'deleted']),
             'auditable_type' => 'App\\Models\\Program',
-            'auditable_id' => fake()->uuid(),
+            'auditable_id' => $this->faker->uuid(),
             'old_values' => null,
-            'new_values' => ['name' => fake()->words(3, true)],
-            'ip_address' => fake()->ipv4(),
-            'user_agent' => fake()->userAgent(),
+            'new_values' => ['name' => $this->faker->words(3, true)],
+            'ip_address' => $this->faker->ipv4(),
+            'user_agent' => $this->faker->userAgent(),
         ];
     }
 }
