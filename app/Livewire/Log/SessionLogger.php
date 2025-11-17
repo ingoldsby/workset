@@ -36,6 +36,7 @@ class SessionLogger extends Component
         if (! $this->session) {
             $this->session = TrainingSession::create([
                 'user_id' => Auth::id(),
+                'scheduled_date' => today(),
                 'started_at' => now(),
                 'is_planned' => false,
             ]);

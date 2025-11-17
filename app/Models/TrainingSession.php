@@ -54,6 +54,11 @@ class TrainingSession extends Model
         return $this->hasMany(SessionExercise::class);
     }
 
+    public function sessionSets(): HasMany
+    {
+        return $this->hasMany(SessionSet::class);
+    }
+
     public function cardioEntries(): HasMany
     {
         return $this->hasMany(CardioEntry::class);
