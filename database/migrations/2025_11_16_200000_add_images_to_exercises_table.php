@@ -9,8 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('exercises', function (Blueprint $table) {
-            $table->string('image_url')->nullable()->after('language');
-            $table->string('thumbnail_url')->nullable()->after('image_url');
+            if (! Schema::hasColumn('exercises', 'image_url')) {
+                $table->string('image_url')->nullable()->after('language');
+            }
+            if (! Schema::hasColumn('exercises', 'thumbnail_url')) {
+                $table->string('thumbnail_url')->nullable()->after('image_url');
+            }
         });
     }
 };
