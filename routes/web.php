@@ -8,6 +8,11 @@ Route::get('/', function () {
     return redirect()->route('today.index');
 })->middleware(['auth', 'verified']);
 
+// Health check endpoint (accessible without auth for monitoring)
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok'], 200);
+})->name('health');
+
 // Offline page (accessible without auth for PWA)
 Route::get('/offline', fn () => view('offline'))->name('offline');
 
