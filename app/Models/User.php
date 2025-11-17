@@ -8,6 +8,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -100,6 +101,21 @@ class User extends Authenticatable implements FilamentUser
     public function invitesSent(): HasMany
     {
         return $this->hasMany(Invite::class, 'inviter_id');
+    }
+
+    public function workoutPreference(): HasOne
+    {
+        return $this->hasOne(WorkoutPreference::class);
+    }
+
+    public function aiWorkoutSuggestions(): HasMany
+    {
+        return $this->hasMany(AiWorkoutSuggestion::class);
+    }
+
+    public function generatedSuggestions(): HasMany
+    {
+        return $this->hasMany(AiWorkoutSuggestion::class, 'generated_by');
     }
 
     public function isAdmin(): bool
