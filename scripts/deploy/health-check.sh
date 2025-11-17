@@ -16,9 +16,9 @@ set -euo pipefail
 ENVIRONMENT="${1:-production}"
 
 if [ "$ENVIRONMENT" == "production" ]; then
-    BASE_URL="https://tracker.kneebone.com.au"
+    BASE_URL="https://workset.kneebone.com.au"
 elif [ "$ENVIRONMENT" == "staging" ]; then
-    BASE_URL="https://staging.tracker.kneebone.com.au"
+    BASE_URL="https://staging.workset.kneebone.com.au"
 else
     echo "Invalid environment: $ENVIRONMENT"
     echo "Usage: $0 [production|staging]"
@@ -160,7 +160,7 @@ fi
 # Test 13: HTTPS redirect (production only)
 if [ "$ENVIRONMENT" == "production" ]; then
     echo "Testing HTTPS redirect..."
-    if curl -s -o /dev/null -w "%{redirect_url}" "http://tracker.kneebone.com.au" | grep -q "https://"; then
+    if curl -s -o /dev/null -w "%{redirect_url}" "http://workset.kneebone.com.au" | grep -q "https://"; then
         test_pass "HTTP to HTTPS redirect working"
     else
         test_fail "HTTP to HTTPS redirect not working"
