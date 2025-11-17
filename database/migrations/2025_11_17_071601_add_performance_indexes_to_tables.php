@@ -65,10 +65,8 @@ return new class extends Migration
         });
 
         // Indexes for program_day_exercises table
-        Schema::table('program_day_exercises', function (Blueprint $table) {
-            // Order exercises within a day (order index) - exercise_id already exists
-            $table->index(['program_day_id', 'order_index']);
-        });
+        // Note: index on ['program_day_id', 'order'] already exists from create table migration
+        // No additional indexes needed
 
         // Indexes for session_plans table
         Schema::table('session_plans', function (Blueprint $table) {
