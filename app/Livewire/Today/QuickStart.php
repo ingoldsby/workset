@@ -13,6 +13,7 @@ class QuickStart extends Component
     {
         $session = TrainingSession::create([
             'user_id' => Auth::id(),
+            'scheduled_date' => today(),
             'started_at' => now(),
             'is_planned' => false,
         ]);
