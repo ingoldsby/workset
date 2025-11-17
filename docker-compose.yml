@@ -8,6 +8,8 @@ services:
     container_name: workset-app
     restart: unless-stopped
     working_dir: /var/www/html
+    ports:
+      - "127.0.0.1:9000:9000"  # PHP-FPM exposed to localhost only for system nginx
     volumes:
       - .:/var/www/html
     networks:
@@ -21,9 +23,10 @@ services:
     image: nginx:alpine
     container_name: workset-nginx
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
+    # ports:
+    #   - "80:80"
+    #   - "443:443"
+    # Ports removed for staging/production - system nginx proxies to this container
     volumes:
       - .:/var/www/html
       - ./docker/nginx:/etc/nginx/conf.d

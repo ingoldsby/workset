@@ -375,9 +375,31 @@ htpasswd -c docker/nginx/.htpasswd jim
 # You'll be prompted to enter password: empirefitness
 ```
 
-### 3.7 Update docker-compose.yml for Production Use
+### 3.7 Configure System Nginx as Reverse Proxy
 
-The existing docker-compose.yml is configured for development. No changes needed, but ensure volumes are properly mounted.
+Since the server may have existing services on ports 80/443, we configure the system nginx to proxy to the Docker containers rather than exposing Docker nginx ports directly.
+
+**Copy the system nginx configuration:**
+
+```bash
+sudo cp docker/nginx/system-nginx-staging.conf /etc/nginx/sites-available/staging.workset.kneebone.com.au
+
+# Enable the site
+sudo ln -s /etc/nginx/sites-available/staging.workset.kneebone.com.au /etc/nginx/sites-enabled/
+
+# Test nginx configuration
+sudo nginx -t
+
+# If test passes, reload nginx
+sudo systemctl reload nginx
+```
+
+**How it works:**
+- System nginx listens on ports 80 and 443 (public-facing)
+- System nginx handles SSL termination and HTTP Basic Auth
+- System nginx proxies PHP requests to `127.0.0.1:9000` (Docker app container)
+- System nginx serves static files directly from `/var/www/workset/public`
+- Docker containers communicate internally via Docker network (no exposed ports except PHP-FPM on localhost)
 
 ### 3.8 Build and Start Services
 
@@ -577,6 +599,28 @@ docker compose logs -f reverb
 ---
 
 ## Part 6: Troubleshooting
+
+### Issue: Port 80/443 already in use (address already in use)
+
+**Error message:**
+```
+Error response from daemon: failed to bind host port 0.0.0.0:80/tcp: address already in use
+```
+
+**Solution:**
+
+This project is configured to use system nginx as a reverse proxy. Ensure you've followed step 3.7 to set up the system nginx configuration rather than exposing Docker nginx ports directly.
+
+If you accidentally tried to run with exposed ports:
+1. Stop Docker services: `docker compose down`
+2. Verify `docker-compose.yml` has nginx ports commented out (lines 24-27)
+3. Verify app container exposes port 9000 to localhost only (line 12)
+4. Configure system nginx as described in step 3.7
+5. Restart: `docker compose up -d`
+
+**Alternative: If you don't have other services on port 80**
+
+If your server doesn't need other services on port 80/443, you can uncomment the nginx ports in `docker-compose.yml` and skip the system nginx setup. However, the reverse proxy setup is recommended for production/staging environments.
 
 ### Issue: Cannot connect to staging.workset.kneebone.com.au
 
