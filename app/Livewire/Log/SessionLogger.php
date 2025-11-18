@@ -87,6 +87,16 @@ class SessionLogger extends Component
             ]);
         }
 
+        // Check if exercise already exists in this session
+        $isDuplicate = collect($this->exercises)->contains(function ($ex) use ($exerciseId, $exerciseType) {
+            return $ex['id'] === $exerciseId && $ex['type'] === $exerciseType;
+        });
+
+        if ($isDuplicate) {
+            session()->flash('warning', __('This exercise has already been added to the session.'));
+            return;
+        }
+
         $exercise = $exerciseType === 'global'
             ? Exercise::find($exerciseId)
             : MemberExercise::find($exerciseId);

@@ -51,60 +51,60 @@
                 </div>
 
                 {{-- Exercises --}}
-                @if($session->exercises->count() > 0)
+                @php
+                    $exercisesWithSets = $session->exercises->filter(fn($ex) => $ex->sets->count() > 0);
+                @endphp
+
+                @if($exercisesWithSets->count() > 0)
                     <div class="space-y-6">
                         <h4 class="text-lg font-semibold text-gray-900">{{ __('Exercises') }}</h4>
 
-                        @foreach($session->exercises as $sessionExercise)
+                        @foreach($exercisesWithSets as $sessionExercise)
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <h5 class="font-semibold text-gray-900 mb-3">
                                     {{ $sessionExercise->getExerciseName() }}
                                 </h5>
 
-                                @if($sessionExercise->sets->count() > 0)
-                                    <div class="overflow-x-auto">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Set') }}</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Weight') }}</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Reps') }}</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('RPE') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            @foreach($sessionExercise->sets as $set)
                                                 <tr>
-                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Set') }}</th>
-                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Weight') }}</th>
-                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Reps') }}</th>
-                                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">{{ __('RPE') }}</th>
+                                                    <td class="px-3 py-2 text-sm text-gray-900">{{ $set->set_number }}</td>
+                                                    <td class="px-3 py-2 text-sm text-gray-900">
+                                                        @if($set->performed_weight)
+                                                            {{ $set->performed_weight }}kg
+                                                        @else
+                                                            <span class="text-gray-400">-</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-3 py-2 text-sm text-gray-900">
+                                                        @if($set->performed_reps)
+                                                            {{ $set->performed_reps }}
+                                                        @else
+                                                            <span class="text-gray-400">-</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-3 py-2 text-sm text-gray-900">
+                                                        @if($set->performed_rpe)
+                                                            {{ $set->performed_rpe }}
+                                                        @else
+                                                            <span class="text-gray-400">-</span>
+                                                        @endif
+                                                    </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                                @foreach($sessionExercise->sets as $set)
-                                                    <tr>
-                                                        <td class="px-3 py-2 text-sm text-gray-900">{{ $set->set_number }}</td>
-                                                        <td class="px-3 py-2 text-sm text-gray-900">
-                                                            @if($set->performed_weight)
-                                                                {{ $set->performed_weight }}kg
-                                                            @else
-                                                                <span class="text-gray-400">-</span>
-                                                            @endif
-                                                        </td>
-                                                        <td class="px-3 py-2 text-sm text-gray-900">
-                                                            @if($set->performed_reps)
-                                                                {{ $set->performed_reps }}
-                                                            @else
-                                                                <span class="text-gray-400">-</span>
-                                                            @endif
-                                                        </td>
-                                                        <td class="px-3 py-2 text-sm text-gray-900">
-                                                            @if($set->performed_rpe)
-                                                                {{ $set->performed_rpe }}
-                                                            @else
-                                                                <span class="text-gray-400">-</span>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @else
-                                    <p class="text-sm text-gray-500">{{ __('No sets logged') }}</p>
-                                @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         @endforeach
                     </div>
