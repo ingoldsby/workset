@@ -123,9 +123,9 @@ class SessionLogger extends Component
         $set = SessionSet::create([
             'session_exercise_id' => $exercise['session_exercise_id'],
             'set_number' => count($exercise['sets']) + 1,
-            'performed_weight' => $setData['weight'] ?? null,
-            'performed_reps' => $setData['reps'] ?? null,
-            'performed_rpe' => $setData['rpe'] ?? null,
+            'performed_weight' => $setData['weight'] ?: null,
+            'performed_reps' => $setData['reps'] ?: null,
+            'performed_rpe' => $setData['rpe'] ?: null,
         ]);
 
         $this->exercises[$exerciseIndex]['sets'][] = $set;
