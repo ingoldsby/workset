@@ -85,7 +85,10 @@
             @else
                 <div class="space-y-3">
                     @foreach($program->versions->sortByDesc('created_at') as $version)
-                        <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition">
+                        <div
+                            wire:click="viewVersion('{{ $version->id }}')"
+                            class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-md transition cursor-pointer"
+                        >
                             <div class="flex justify-between items-center">
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-3">
@@ -105,7 +108,7 @@
                                 <div class="flex space-x-2">
                                     @if(!$version->is_active)
                                         <button
-                                            wire:click="activateVersion('{{ $version->id }}')"
+                                            wire:click.stop="activateVersion('{{ $version->id }}')"
                                             class="text-green-600 hover:text-green-800 text-sm font-medium"
                                         >
                                             {{ __('Activate') }}

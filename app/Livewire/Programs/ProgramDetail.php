@@ -119,6 +119,14 @@ class ProgramDetail extends Component
         $this->reset(['versionChangeNotes', 'showCreateVersionModal']);
     }
 
+    public function viewVersion(string $versionId): void
+    {
+        $this->redirect(route('programs.versions.show', [
+            'program' => $this->program->id,
+            'version' => $versionId
+        ]));
+    }
+
     public function render(): View
     {
         return view('livewire.programs.program-detail');
