@@ -23,7 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Main app sections
     Route::get('/today', fn () => view('today.index'))->name('today.index');
     Route::get('/plan', fn () => view('plan.index'))->name('plan.index');
-    Route::get('/log', fn () => view('log.index'))->name('log.index');
+    Route::get('/log/{session?}', fn (?string $session = null) => view('log.index', ['session' => $session]))->name('log.index');
     Route::get('/programs', fn () => view('programs.index'))->name('programs.index');
     Route::get('/programs/progression-builder', fn () => view('programs.progression-builder'))->name('programs.progressionBuilder');
     Route::get('/exercises', fn () => view('exercises.index'))->name('exercises.index');
