@@ -72,6 +72,7 @@
 
                 <div class="mt-6 flex space-x-3">
                     <button
+                        wire:click="openExerciseSelector"
                         class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"
                     >
                         {{ __('Add Exercise') }}
@@ -98,6 +99,61 @@
                 >
                     {{ __('Go to Today') }}
                 </a>
+            </div>
+        </div>
+    @endif
+
+    {{-- Exercise Selector Modal --}}
+    @if($showExerciseSelector)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                {{-- Background overlay --}}
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeExerciseSelector"></div>
+
+                {{-- Modal panel --}}
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">{{ __('Select Exercise') }}</h3>
+                            <button wire:click="closeExerciseSelector" class="text-gray-400 hover:text-gray-500">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {{-- Search --}}
+                        <div class="mb-4">
+                            <input
+                                type="text"
+                                wire:model.live.debounce.300ms="exerciseSearch"
+                                placeholder="{{ __('Search exercises...') }}"
+                                class="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
+                            >
+                        </div>
+
+                        {{-- Exercise List --}}
+                        <div class="max-h-96 overflow-y-auto">
+                            @if($availableExercises->isEmpty())
+                                <div class="text-center py-8 text-gray-500">
+                                    <p>{{ __('No exercises found.') }}</p>
+                                </div>
+                            @else
+                                <div class="space-y-2">
+                                    @foreach($availableExercises as $exercise)
+                                        <button
+                                            wire:click="selectExercise('{{ $exercise['id'] }}', '{{ $exercise['type'] }}')"
+                                            class="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+                                        >
+                                            <div class="font-medium text-gray-900">{{ $exercise['name'] }}</div>
+                                            <div class="text-xs text-gray-500">{{ $exercise['type'] === 'member' ? __('My Exercise') : __('Global Library') }}</div>
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     @endif

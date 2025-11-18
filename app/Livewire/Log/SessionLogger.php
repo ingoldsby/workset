@@ -19,6 +19,9 @@ class SessionLogger extends Component
     public Collection $exercises;
     public int $restTimerSeconds = 0;
     public bool $timerActive = false;
+    public bool $showExerciseSelector = false;
+    public string $exerciseSearch = '';
+    public Collection $availableExercises;
 
     public function mount(?string $sessionId = null): void
     {
@@ -30,6 +33,50 @@ class SessionLogger extends Component
         }
 
         $this->exercises = collect();
+        $this->availableExercises = collect();
+    }
+
+    public function openExerciseSelector(): void
+    {
+        $this->showExerciseSelector = true;
+        $this->loadAvailableExercises();
+    }
+
+    public function closeExerciseSelector(): void
+    {
+        $this->showExerciseSelector = false;
+        $this->exerciseSearch = '';
+    }
+
+    public function updatedExerciseSearch(): void
+    {
+        $this->loadAvailableExercises();
+    }
+
+    public function loadAvailableExercises(): void
+    {
+        $globalExercises = Exercise::query()
+            ->when($this->exerciseSearch, fn($q) => $q->where('name', 'like', "%{$this->exerciseSearch}%"))
+            ->orderBy('name')
+            ->limit(20)
+            ->get()
+            ->map(fn($ex) => ['id' => $ex->id, 'name' => $ex->name, 'type' => 'global']);
+
+        $memberExercises = MemberExercise::query()
+            ->where('user_id', Auth::id())
+            ->when($this->exerciseSearch, fn($q) => $q->where('name', 'like', "%{$this->exerciseSearch}%"))
+            ->orderBy('name')
+            ->limit(20)
+            ->get()
+            ->map(fn($ex) => ['id' => $ex->id, 'name' => $ex->name, 'type' => 'member']);
+
+        $this->availableExercises = $memberExercises->concat($globalExercises);
+    }
+
+    public function selectExercise(string $exerciseId, string $exerciseType): void
+    {
+        $this->addExercise($exerciseId, $exerciseType);
+        $this->closeExerciseSelector();
     }
 
     public function addExercise(string $exerciseId, string $exerciseType): void
