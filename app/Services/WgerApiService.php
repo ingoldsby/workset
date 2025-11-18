@@ -29,8 +29,8 @@ class WgerApiService
     }
 
     /**
-     * Fetch all exercises from wger API using exercisebase endpoint
-     * This endpoint has complete muscle/equipment data with translations
+     * Fetch all exercises from wger API using exerciseinfo endpoint
+     * This endpoint has translations with names/descriptions plus muscle/equipment data
      */
     public function fetchExercises(int $limit = 100): array
     {
@@ -40,10 +40,9 @@ class WgerApiService
 
         while ($hasMore) {
             try {
-                $response = $this->client()->get('exercisebaseinfo/', [
+                $response = $this->client()->get('exerciseinfo/', [
                     'limit' => $limit,
                     'offset' => $offset,
-                    'language' => $this->languageId,
                 ]);
 
                 if (! $response->successful()) {
