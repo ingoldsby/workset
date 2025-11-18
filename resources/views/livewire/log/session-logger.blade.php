@@ -45,14 +45,14 @@
                                             <div class="flex items-center justify-between bg-gray-50 p-2 rounded">
                                                 <span class="text-sm text-gray-600">{{ __('Set') }} {{ $set->set_number }}</span>
                                                 <div class="text-sm">
-                                                    @if($set->weight_performed)
-                                                        <span class="font-medium">{{ $set->weight_performed }}kg</span>
+                                                    @if($set->performed_weight)
+                                                        <span class="font-medium">{{ $set->performed_weight }}kg</span>
                                                     @endif
-                                                    @if($set->reps_performed)
-                                                        <span class="ml-2">&times; {{ $set->reps_performed }}</span>
+                                                    @if($set->performed_reps)
+                                                        <span class="ml-2">&times; {{ $set->performed_reps }}</span>
                                                     @endif
-                                                    @if($set->rpe_performed)
-                                                        <span class="ml-2 text-gray-500">RPE {{ $set->rpe_performed }}</span>
+                                                    @if($set->performed_rpe)
+                                                        <span class="ml-2 text-gray-500">RPE {{ $set->performed_rpe }}</span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -60,11 +60,52 @@
                                     </div>
                                 @endif
 
-                                <button
-                                    class="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700"
-                                >
-                                    {{ __('Add Set') }}
-                                </button>
+                                {{-- Add Set Form --}}
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2" x-data="{
+                                    weight: '',
+                                    reps: '',
+                                    rpe: ''
+                                }">
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('Weight (kg)') }}</label>
+                                            <input
+                                                type="number"
+                                                step="0.5"
+                                                x-model="weight"
+                                                placeholder="0"
+                                                class="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded text-sm"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('Reps') }}</label>
+                                            <input
+                                                type="number"
+                                                x-model="reps"
+                                                placeholder="0"
+                                                class="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded text-sm"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700 mb-1">{{ __('RPE') }}</label>
+                                            <input
+                                                type="number"
+                                                step="0.5"
+                                                min="0"
+                                                max="10"
+                                                x-model="rpe"
+                                                placeholder="0"
+                                                class="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded text-sm"
+                                            >
+                                        </div>
+                                    </div>
+                                    <button
+                                        @click="$wire.addSet({{ $index }}, { weight: weight, reps: reps, rpe: rpe }).then(() => { weight = ''; reps = ''; rpe = ''; })"
+                                        class="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700"
+                                    >
+                                        {{ __('Add Set') }}
+                                    </button>
+                                </div>
                             </div>
                         @endforeach
                     </div>
