@@ -14,7 +14,7 @@ class CalendarView extends Component
     public int $currentYear;
     public int $currentMonth;
     public Collection $sessionPlans;
-    public ?int $selectedUserId = null;
+    public ?string $selectedUserId = null;
 
     public function mount(): void
     {
