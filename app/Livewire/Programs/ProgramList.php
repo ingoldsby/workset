@@ -69,8 +69,7 @@ class ProgramList extends Component
 
     public function viewProgram(string $programId): void
     {
-        // TODO: Implement program detail view
-        // $this->redirect(route('programs.show', $programId));
+        $this->redirect(route('programs.show', $programId));
     }
 
     public function render(): View
