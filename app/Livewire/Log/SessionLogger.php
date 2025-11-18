@@ -123,9 +123,9 @@ class SessionLogger extends Component
         $set = SessionSet::create([
             'session_exercise_id' => $exercise['session_exercise_id'],
             'set_number' => count($exercise['sets']) + 1,
-            'performed_weight' => $setData['weight'] ?: null,
-            'performed_reps' => $setData['reps'] ?: null,
-            'performed_rpe' => $setData['rpe'] ?: null,
+            'performed_weight' => $this->sanitizeNumericInput($setData['weight'] ?? null),
+            'performed_reps' => $this->sanitizeNumericInput($setData['reps'] ?? null),
+            'performed_rpe' => $this->sanitizeNumericInput($setData['rpe'] ?? null),
         ]);
 
         $this->exercises[$exerciseIndex]['sets'][] = $set;
@@ -134,6 +134,15 @@ class SessionLogger extends Component
         if (isset($setData['restTime']) && $setData['restTime'] > 0) {
             $this->startRestTimer($setData['restTime']);
         }
+    }
+
+    private function sanitizeNumericInput(mixed $value): ?float
+    {
+        if ($value === '' || $value === null) {
+            return null;
+        }
+
+        return (float) $value;
     }
 
     public function startRestTimer(int $seconds): void
