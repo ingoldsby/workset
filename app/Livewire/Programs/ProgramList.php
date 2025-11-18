@@ -20,10 +20,7 @@ class ProgramList extends Component
     public function loadPrograms(): void
     {
         $query = Program::with(['activeVersion', 'owner'])
-            ->where(function ($q) {
-                $q->where('owner_id', Auth::id())
-                    ->orWhere('created_by_pt_id', Auth::id());
-            });
+            ->where('owner_id', Auth::id());
 
         if (Auth::user()->isPt()) {
             // PTs can see programs for their assigned members
