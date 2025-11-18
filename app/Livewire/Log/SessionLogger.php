@@ -4,6 +4,7 @@ namespace App\Livewire\Log;
 
 use App\Models\Exercise;
 use App\Models\MemberExercise;
+use App\Models\SessionExercise;
 use App\Models\SessionSet;
 use App\Models\TrainingSession;
 use Illuminate\Support\Collection;
@@ -22,7 +23,7 @@ class SessionLogger extends Component
     public function mount(?string $sessionId = null): void
     {
         if ($sessionId) {
-            $this->session = TrainingSession::with(['sessionSets.exercise', 'sessionSets.memberExercise'])
+            $this->session = TrainingSession::with(['exercises.exercise', 'exercises.memberExercise', 'exercises.sets'])
                 ->findOrFail($sessionId);
 
             $this->authorize('update', $this->session);
@@ -50,7 +51,16 @@ class SessionLogger extends Component
             return;
         }
 
+        // Create SessionExercise record
+        $sessionExercise = SessionExercise::create([
+            'training_session_id' => $this->session->id,
+            'exercise_id' => $exerciseType === 'global' ? $exerciseId : null,
+            'member_exercise_id' => $exerciseType === 'member' ? $exerciseId : null,
+            'order' => $this->exercises->count(),
+        ]);
+
         $this->exercises->push([
+            'session_exercise_id' => $sessionExercise->id,
             'id' => $exerciseId,
             'type' => $exerciseType,
             'name' => $exercise->name,
@@ -67,14 +77,11 @@ class SessionLogger extends Component
         }
 
         $set = SessionSet::create([
-            'training_session_id' => $this->session->id,
-            'exercise_id' => $exercise['type'] === 'global' ? $exercise['id'] : null,
-            'member_exercise_id' => $exercise['type'] === 'member' ? $exercise['id'] : null,
+            'session_exercise_id' => $exercise['session_exercise_id'],
             'set_number' => count($exercise['sets']) + 1,
-            'weight_performed' => $setData['weight'] ?? null,
-            'reps_performed' => $setData['reps'] ?? null,
-            'rpe_performed' => $setData['rpe'] ?? null,
-            'notes' => $setData['notes'] ?? null,
+            'performed_weight' => $setData['weight'] ?? null,
+            'performed_reps' => $setData['reps'] ?? null,
+            'performed_rpe' => $setData['rpe'] ?? null,
         ]);
 
         $exercise['sets'][] = $set;
