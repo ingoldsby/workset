@@ -24,6 +24,11 @@ class WgerExerciseTransformer
             throw new \Exception("No translation found for exercise {$wgerExercise['id']} in language {$languageId}");
         }
 
+        // Extract category ID early (needed for muscle fallback)
+        $categoryId = is_array($wgerExercise['category'])
+            ? $wgerExercise['category']['id']
+            : $wgerExercise['category'];
+
         // Extract equipment IDs from the new structure
         $equipmentIds = array_map(fn($eq) => $eq['id'], $wgerExercise['equipment'] ?? []);
 
@@ -53,9 +58,6 @@ class WgerExerciseTransformer
         $mechanics = self::determineMechanics($primaryMuscleIds, $secondaryMuscleIds);
 
         // Determine category from wger category
-        $categoryId = is_array($wgerExercise['category'])
-            ? $wgerExercise['category']['id']
-            : $wgerExercise['category'];
         $category = self::determineCategory($categoryId);
 
         // Clean description (wger uses HTML)
