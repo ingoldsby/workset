@@ -33,6 +33,27 @@ class WgerMuscleMapper
     }
 
     /**
+     * Map wger category ID to our MuscleGroup enum as fallback
+     * Used when exercise has category but no muscle data
+     *
+     * Based on wger's category API:
+     * https://wger.de/api/v2/exercisecategory/
+     */
+    public static function mapCategory(int $categoryId): ?MuscleGroup
+    {
+        return match ($categoryId) {
+            10 => MuscleGroup::Abs, // Abs
+            8 => MuscleGroup::Biceps, // Arms (default to biceps)
+            12 => MuscleGroup::Lats, // Back (default to lats)
+            14 => MuscleGroup::Calves, // Calves
+            11 => MuscleGroup::Chest, // Chest
+            9 => MuscleGroup::Quads, // Legs (default to quads)
+            13 => MuscleGroup::Shoulders, // Shoulders
+            default => null,
+        };
+    }
+
+    /**
      * Map multiple wger muscle IDs to our MuscleGroup enums
      *
      * @param array<int> $wgerIds

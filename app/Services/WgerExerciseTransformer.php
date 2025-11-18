@@ -37,8 +37,14 @@ class WgerExerciseTransformer
             ? WgerEquipmentMapper::getVariants($equipmentIds, $primaryEquipment)
             : [];
 
-        // Map muscles
+        // Map muscles (with category fallback)
         $primaryMuscle = WgerMuscleMapper::determinePrimary($primaryMuscleIds, $secondaryMuscleIds);
+
+        // Fallback to category if no muscle data
+        if (!$primaryMuscle && $categoryId) {
+            $primaryMuscle = WgerMuscleMapper::mapCategory($categoryId);
+        }
+
         $secondaryMuscles = $primaryMuscle
             ? WgerMuscleMapper::getSecondary($primaryMuscleIds, $secondaryMuscleIds, $primaryMuscle)
             : [];
@@ -174,10 +180,16 @@ class WgerExerciseTransformer
             return false;
         }
 
-        // Must have at least one muscle group
+        // Must have at least one muscle group OR a valid category
         $hasMuscles = ! empty($wgerExercise['muscles']) || ! empty($wgerExercise['muscles_secondary']);
 
-        if (! $hasMuscles) {
+        // Check if category maps to a muscle group
+        $categoryId = is_array($wgerExercise['category'])
+            ? $wgerExercise['category']['id']
+            : $wgerExercise['category'];
+        $categoryMapsToMuscle = $categoryId && WgerMuscleMapper::mapCategory($categoryId) !== null;
+
+        if (! $hasMuscles && ! $categoryMapsToMuscle) {
             return false;
         }
 
