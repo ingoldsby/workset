@@ -12,6 +12,8 @@ class ProgramList extends Component
 {
     public Collection $programs;
     public bool $showCreateModal = false;
+    public string $name = '';
+    public string $description = '';
 
     public function mount(): void
     {
@@ -40,9 +42,35 @@ class ProgramList extends Component
         $this->showCreateModal = true;
     }
 
+    public function saveProgram(): void
+    {
+        $this->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        Program::create([
+            'owner_id' => Auth::id(),
+            'name' => $this->name,
+            'description' => $this->description,
+            'visibility' => 'private',
+        ]);
+
+        $this->reset(['name', 'description', 'showCreateModal']);
+        $this->loadPrograms();
+
+        session()->flash('message', 'Program created successfully.');
+    }
+
+    public function cancelCreate(): void
+    {
+        $this->reset(['name', 'description', 'showCreateModal']);
+    }
+
     public function viewProgram(string $programId): void
     {
-        $this->redirect(route('programs.show', $programId));
+        // TODO: Implement program detail view
+        // $this->redirect(route('programs.show', $programId));
     }
 
     public function render(): View
