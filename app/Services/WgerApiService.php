@@ -29,7 +29,8 @@ class WgerApiService
     }
 
     /**
-     * Fetch all exercises from wger API
+     * Fetch all exercises from wger API using exerciseinfo endpoint
+     * This endpoint includes translations with names and descriptions
      */
     public function fetchExercises(int $limit = 100): array
     {
@@ -39,8 +40,7 @@ class WgerApiService
 
         while ($hasMore) {
             try {
-                $response = $this->client()->get('exercise/', [
-                    'language' => $this->languageId,
+                $response = $this->client()->get('exerciseinfo/', [
                     'limit' => $limit,
                     'offset' => $offset,
                 ]);

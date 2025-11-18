@@ -24,6 +24,7 @@ class ImportExercisesFromWger extends Command
     protected int $skipped = 0;
     protected int $failed = 0;
     protected int $imagesDownloaded = 0;
+    protected int $languageId;
 
     public function handle(): int
     {
@@ -42,8 +43,8 @@ class ImportExercisesFromWger extends Command
         }
 
         // Initialize service
-        $languageId = (int) $this->option('language');
-        $service = new WgerApiService($languageId);
+        $this->languageId = (int) $this->option('language');
+        $service = new WgerApiService($this->languageId);
 
         try {
             // Fetch exercises
@@ -118,7 +119,7 @@ class ImportExercisesFromWger extends Command
     protected function processExercise(array $wgerExercise, WgerApiService $service): void
     {
         // Check if should import
-        if (! WgerExerciseTransformer::shouldImport($wgerExercise)) {
+        if (! WgerExerciseTransformer::shouldImport($wgerExercise, $this->languageId)) {
             $this->skipped++;
 
             return;
@@ -128,7 +129,7 @@ class ImportExercisesFromWger extends Command
             DB::beginTransaction();
 
             // Transform exercise data
-            $exerciseData = WgerExerciseTransformer::transform($wgerExercise);
+            $exerciseData = WgerExerciseTransformer::transform($wgerExercise, $this->languageId);
 
             // Check for existing by wger_id
             $existing = Exercise::query()
@@ -155,9 +156,13 @@ class ImportExercisesFromWger extends Command
             DB::rollBack();
             $this->failed++;
 
+            // Get exercise name from translation for better error logging
+            $translation = WgerExerciseTransformer::getTranslation($wgerExercise, $this->languageId);
+            $name = $translation['name'] ?? 'Unknown';
+
             Log::error('Failed to import exercise', [
                 'wger_id' => $wgerExercise['id'] ?? null,
-                'name' => $wgerExercise['name'] ?? null,
+                'name' => $name,
                 'error' => $e->getMessage(),
             ]);
         }

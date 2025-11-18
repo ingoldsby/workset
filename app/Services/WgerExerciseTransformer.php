@@ -9,17 +9,27 @@ use App\Enums\ExerciseMechanics;
 class WgerExerciseTransformer
 {
     /**
-     * Transform wger exercise data to our Exercise model format
+     * Transform wger exerciseinfo data to our Exercise model format
      *
-     * @param array $wgerExercise Exercise data from wger API
-     * @param array $wgerImages Optional image data from wger API
+     * @param array $wgerExercise Exercise data from wger API exerciseinfo endpoint
+     * @param int $languageId Language ID to extract (default 2 = English)
      * @return array Exercise attributes ready for database insertion
      */
-    public static function transform(array $wgerExercise, array $wgerImages = []): array
+    public static function transform(array $wgerExercise, int $languageId = 2): array
     {
-        $equipmentIds = $wgerExercise['equipment'] ?? [];
-        $primaryMuscleIds = $wgerExercise['muscles'] ?? [];
-        $secondaryMuscleIds = $wgerExercise['muscles_secondary'] ?? [];
+        // Extract translation data for the specified language
+        $translation = self::getTranslation($wgerExercise, $languageId);
+
+        if (!$translation) {
+            throw new \Exception("No translation found for exercise {$wgerExercise['id']} in language {$languageId}");
+        }
+
+        // Extract equipment IDs from the new structure
+        $equipmentIds = array_map(fn($eq) => $eq['id'], $wgerExercise['equipment'] ?? []);
+
+        // Extract muscle IDs from the new structure
+        $primaryMuscleIds = array_map(fn($m) => $m['id'], $wgerExercise['muscles'] ?? []);
+        $secondaryMuscleIds = array_map(fn($m) => $m['id'], $wgerExercise['muscles_secondary'] ?? []);
 
         // Map equipment
         $primaryEquipment = WgerEquipmentMapper::determinePrimary($equipmentIds);
@@ -37,16 +47,19 @@ class WgerExerciseTransformer
         $mechanics = self::determineMechanics($primaryMuscleIds, $secondaryMuscleIds);
 
         // Determine category from wger category
-        $category = self::determineCategory($wgerExercise['category'] ?? null);
+        $categoryId = is_array($wgerExercise['category'])
+            ? $wgerExercise['category']['id']
+            : $wgerExercise['category'];
+        $category = self::determineCategory($categoryId);
 
         // Clean description (wger uses HTML)
-        $description = self::cleanDescription($wgerExercise['description'] ?? '');
+        $description = self::cleanDescription($translation['description'] ?? '');
 
-        // Build aliases from variations
-        $aliases = self::buildAliases($wgerExercise);
+        // Build aliases from translation
+        $aliases = $translation['aliases'] ?? [];
 
         return [
-            'name' => trim($wgerExercise['name']),
+            'name' => trim($translation['name']),
             'description' => $description,
             'category' => $category,
             'primary_muscle' => $primaryMuscle,
@@ -57,8 +70,25 @@ class WgerExerciseTransformer
             'level' => ExerciseLevel::Intermediate, // Default level
             'aliases' => $aliases,
             'wger_id' => $wgerExercise['id'],
-            'language' => $wgerExercise['language'] ?? 2, // Default English
+            'language' => $languageId,
         ];
+    }
+
+    /**
+     * Get translation for specified language from exerciseinfo translations array
+     */
+    public static function getTranslation(array $wgerExercise, int $languageId): ?array
+    {
+        $translations = $wgerExercise['translations'] ?? [];
+
+        foreach ($translations as $translation) {
+            if ($translation['language'] === $languageId) {
+                return $translation;
+            }
+        }
+
+        // Fallback to first available translation if specified language not found
+        return $translations[0] ?? null;
     }
 
     /**
@@ -122,39 +152,25 @@ class WgerExerciseTransformer
     }
 
     /**
-     * Build aliases array from wger exercise data
-     *
-     * @return array<string>
-     */
-    protected static function buildAliases(array $wgerExercise): array
-    {
-        $aliases = [];
-
-        // Add alternate names if present
-        if (! empty($wgerExercise['aliases'])) {
-            if (is_array($wgerExercise['aliases'])) {
-                $aliases = array_merge($aliases, $wgerExercise['aliases']);
-            } elseif (is_string($wgerExercise['aliases'])) {
-                // Handle comma-separated aliases
-                $parsed = array_map('trim', explode(',', $wgerExercise['aliases']));
-                $aliases = array_merge($aliases, $parsed);
-            }
-        }
-
-        // Filter out empty and duplicate aliases
-        $aliases = array_filter(array_unique($aliases));
-
-        return array_values($aliases);
-    }
-
-    /**
      * Check if exercise should be imported
      * Filter out low-quality or incomplete exercises
      */
-    public static function shouldImport(array $wgerExercise): bool
+    public static function shouldImport(array $wgerExercise, int $languageId = 2): bool
     {
+        // Must have translations
+        if (empty($wgerExercise['translations'])) {
+            return false;
+        }
+
+        // Get translation for the specified language
+        $translation = self::getTranslation($wgerExercise, $languageId);
+
+        if (!$translation) {
+            return false;
+        }
+
         // Must have a name
-        if (empty($wgerExercise['name'])) {
+        if (empty($translation['name'])) {
             return false;
         }
 
@@ -166,7 +182,7 @@ class WgerExerciseTransformer
         }
 
         // Filter out very generic or placeholder exercises
-        $name = strtolower($wgerExercise['name']);
+        $name = strtolower($translation['name']);
         $blacklist = ['test', 'placeholder', 'example', 'demo'];
 
         foreach ($blacklist as $term) {
@@ -182,15 +198,16 @@ class WgerExerciseTransformer
      * Batch transform multiple exercises
      *
      * @param array<array> $wgerExercises
+     * @param int $languageId Language ID to use for filtering and transformation
      * @return array<array>
      */
-    public static function transformMany(array $wgerExercises): array
+    public static function transformMany(array $wgerExercises, int $languageId = 2): array
     {
         $transformed = [];
 
         foreach ($wgerExercises as $exercise) {
-            if (self::shouldImport($exercise)) {
-                $transformed[] = self::transform($exercise);
+            if (self::shouldImport($exercise, $languageId)) {
+                $transformed[] = self::transform($exercise, $languageId);
             }
         }
 
