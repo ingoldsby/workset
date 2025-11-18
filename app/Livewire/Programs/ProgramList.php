@@ -12,6 +12,8 @@ class ProgramList extends Component
 {
     public Collection $programs;
     public bool $showCreateModal = false;
+    public string $name = '';
+    public string $description = '';
 
     public function mount(): void
     {
@@ -20,11 +22,8 @@ class ProgramList extends Component
 
     public function loadPrograms(): void
     {
-        $query = Program::with(['activeVersion', 'owner'])
-            ->where(function ($q) {
-                $q->where('owner_id', Auth::id())
-                    ->orWhere('created_by_pt_id', Auth::id());
-            });
+        $query = Program::with(['owner', 'activeVersion'])
+            ->where('owner_id', Auth::id());
 
         if (Auth::user()->isPt()) {
             // PTs can see programs for their assigned members
@@ -41,6 +40,31 @@ class ProgramList extends Component
     public function createProgram(): void
     {
         $this->showCreateModal = true;
+    }
+
+    public function saveProgram(): void
+    {
+        $this->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        Program::create([
+            'owner_id' => Auth::id(),
+            'name' => $this->name,
+            'description' => $this->description,
+            'visibility' => 'private',
+        ]);
+
+        $this->reset(['name', 'description', 'showCreateModal']);
+        $this->loadPrograms();
+
+        session()->flash('message', 'Program created successfully.');
+    }
+
+    public function cancelCreate(): void
+    {
+        $this->reset(['name', 'description', 'showCreateModal']);
     }
 
     public function viewProgram(string $programId): void

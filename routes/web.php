@@ -26,6 +26,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/log/{session?}', fn (?string $session = null) => view('log.index', ['session' => $session]))->name('log.index');
     Route::get('/programs', fn () => view('programs.index'))->name('programs.index');
     Route::get('/programs/progression-builder', fn () => view('programs.progression-builder'))->name('programs.progressionBuilder');
+    Route::get('/programs/{program}', fn (string $program) => view('programs.show', ['program' => $program]))->name('programs.show');
+    Route::get('/programs/{program}/versions/{version}', fn (string $program, string $version) => view('programs.version-show', ['programId' => $program, 'versionId' => $version]))->name('programs.versions.show');
     Route::get('/exercises', fn () => view('exercises.index'))->name('exercises.index');
     Route::get('/history', fn () => view('history.index'))->name('history.index');
     Route::get('/history/{session}', fn (string $session) => view('history.show', ['session' => $session]))->name('history.show');

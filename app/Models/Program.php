@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 
@@ -62,13 +63,9 @@ class Program extends Model
         return $this->hasMany(Program::class, 'cloned_from_id');
     }
 
-    public function activeVersion(): ?ProgramVersion
+    public function activeVersion(): HasOne
     {
-        return cache()->remember(
-            "program.{$this->id}.active_version",
-            now()->addHour(),
-            fn () => $this->versions()->where('is_active', true)->first()
-        );
+        return $this->hasOne(ProgramVersion::class)->where('is_active', true);
     }
 
     public function isPublic(): bool
