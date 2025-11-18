@@ -15,7 +15,6 @@ class QuickStart extends Component
             'user_id' => Auth::id(),
             'scheduled_date' => today(),
             'started_at' => now(),
-            'is_planned' => false,
         ]);
 
         $this->redirect(route('log.index', ['session' => $session->id]));
