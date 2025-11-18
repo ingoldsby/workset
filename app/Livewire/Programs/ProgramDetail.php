@@ -10,6 +10,9 @@ use Livewire\Component;
 class ProgramDetail extends Component
 {
     public Program $program;
+    public bool $showEditModal = false;
+    public string $editName = '';
+    public string $editDescription = '';
 
     public function mount(string $programId): void
     {
@@ -31,6 +34,50 @@ class ProgramDetail extends Component
                 abort(403, 'Unauthorised access to this program.');
             }
         }
+    }
+
+    public function editProgram(): void
+    {
+        $this->editName = $this->program->name;
+        $this->editDescription = $this->program->description ?? '';
+        $this->showEditModal = true;
+    }
+
+    public function saveEdit(): void
+    {
+        $this->validate([
+            'editName' => 'required|string|max:255',
+            'editDescription' => 'nullable|string',
+        ]);
+
+        $this->program->update([
+            'name' => $this->editName,
+            'description' => $this->editDescription,
+        ]);
+
+        $this->showEditModal = false;
+        $this->program->refresh();
+
+        session()->flash('message', 'Program updated successfully.');
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->reset(['editName', 'editDescription', 'showEditModal']);
+    }
+
+    public function activateVersion(string $versionId): void
+    {
+        // Deactivate all versions
+        $this->program->versions()->update(['is_active' => false]);
+
+        // Activate the selected version
+        $this->program->versions()->where('id', $versionId)->update(['is_active' => true]);
+
+        $this->program->refresh();
+        $this->program->load(['activeVersion', 'versions']);
+
+        session()->flash('message', 'Version activated successfully.');
     }
 
     public function render(): View

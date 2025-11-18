@@ -1,4 +1,10 @@
 <div class="space-y-6">
+    @if(session()->has('message'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('message') }}</span>
+        </div>
+    @endif
+
     {{-- Program Header --}}
     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="p-6">
@@ -37,6 +43,7 @@
 
                 <div class="flex space-x-2">
                     <button
+                        wire:click="editProgram"
                         class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700"
                     >
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,6 +63,8 @@
                 <h4 class="text-lg font-semibold text-gray-900">
                     {{ __('Program Versions') }}
                 </h4>
+                {{-- TODO: Implement version creation functionality --}}
+                {{--
                 <button
                     class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700"
                 >
@@ -64,6 +73,7 @@
                     </svg>
                     {{ __('New Version') }}
                 </button>
+                --}}
             </div>
 
             @if($program->versions->isEmpty())
@@ -95,11 +105,11 @@
                                     </p>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                        {{ __('View') }}
-                                    </button>
                                     @if(!$version->is_active)
-                                        <button class="text-green-600 hover:text-green-800 text-sm font-medium">
+                                        <button
+                                            wire:click="activateVersion('{{ $version->id }}')"
+                                            class="text-green-600 hover:text-green-800 text-sm font-medium"
+                                        >
                                             {{ __('Activate') }}
                                         </button>
                                     @endif
@@ -148,4 +158,76 @@
             </dl>
         </div>
     </div>
+
+    {{-- Edit Program Modal --}}
+    @if($showEditModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" wire:click="cancelEdit"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <form wire:submit.prevent="saveEdit">
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div class="sm:flex sm:items-start">
+                                <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
+                                        {{ __('Edit Program') }}
+                                    </h3>
+                                    <div class="mt-2 space-y-4">
+                                        <div>
+                                            <label for="editName" class="block text-sm font-medium text-gray-700">
+                                                {{ __('Program Name') }}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="editName"
+                                                wire:model="editName"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                                autofocus
+                                            >
+                                            @error('editName')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="editDescription" class="block text-sm font-medium text-gray-700">
+                                                {{ __('Description') }} <span class="text-gray-500 text-xs">({{ __('Optional') }})</span>
+                                            </label>
+                                            <textarea
+                                                id="editDescription"
+                                                wire:model="editDescription"
+                                                rows="3"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                            ></textarea>
+                                            @error('editDescription')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button
+                                type="submit"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                            >
+                                {{ __('Save Changes') }}
+                            </button>
+                            <button
+                                type="button"
+                                wire:click="cancelEdit"
+                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                            >
+                                {{ __('Cancel') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
