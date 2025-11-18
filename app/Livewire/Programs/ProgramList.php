@@ -11,7 +11,6 @@ use Livewire\Component;
 class ProgramList extends Component
 {
     public Collection $programs;
-    public bool $showCreateModal = false;
 
     public function mount(): void
     {
@@ -40,7 +39,7 @@ class ProgramList extends Component
 
     public function createProgram(): void
     {
-        $this->showCreateModal = true;
+        $this->redirect(route('programs.create'));
     }
 
     public function viewProgram(string $programId): void

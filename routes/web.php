@@ -26,6 +26,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/log/{session?}', fn (?string $session = null) => view('log.index', ['session' => $session]))->name('log.index');
     Route::get('/programs', fn () => view('programs.index'))->name('programs.index');
     Route::get('/programs/progression-builder', fn () => view('programs.progression-builder'))->name('programs.progressionBuilder');
+    Route::get('/programs/create', [\App\Http\Controllers\ProgramController::class, 'create'])->name('programs.create');
+    Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
+    Route::get('/programs/{program}', [\App\Http\Controllers\ProgramController::class, 'show'])->name('programs.show');
+    Route::get('/programs/{program}/edit', [\App\Http\Controllers\ProgramController::class, 'edit'])->name('programs.edit');
+    Route::put('/programs/{program}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('programs.update');
+    Route::delete('/programs/{program}', [\App\Http\Controllers\ProgramController::class, 'destroy'])->name('programs.destroy');
     Route::get('/exercises', fn () => view('exercises.index'))->name('exercises.index');
     Route::get('/history', fn () => view('history.index'))->name('history.index');
     Route::get('/history/{session}', fn (string $session) => view('history.show', ['session' => $session]))->name('history.show');
