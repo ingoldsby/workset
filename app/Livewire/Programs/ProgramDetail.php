@@ -13,6 +13,8 @@ class ProgramDetail extends Component
     public bool $showEditModal = false;
     public string $editName = '';
     public string $editDescription = '';
+    public bool $showCreateVersionModal = false;
+    public string $versionChangeNotes = '';
 
     public function mount(string $programId): void
     {
@@ -78,6 +80,43 @@ class ProgramDetail extends Component
         $this->program->load(['activeVersion', 'versions']);
 
         session()->flash('message', 'Version activated successfully.');
+    }
+
+    public function createVersion(): void
+    {
+        $this->versionChangeNotes = '';
+        $this->showCreateVersionModal = true;
+    }
+
+    public function saveVersion(): void
+    {
+        $this->validate([
+            'versionChangeNotes' => 'nullable|string|max:500',
+        ]);
+
+        // Get the next version number
+        $nextVersionNumber = $this->program->versions()->max('version_number') + 1;
+
+        // Create the new version
+        $newVersion = $this->program->versions()->create([
+            'created_by' => Auth::id(),
+            'version_number' => $nextVersionNumber,
+            'change_notes' => $this->versionChangeNotes ?: null,
+            'is_active' => $this->program->versions()->count() === 0, // Make first version active
+        ]);
+
+        $this->showCreateVersionModal = false;
+        $this->versionChangeNotes = '';
+
+        $this->program->refresh();
+        $this->program->load(['activeVersion', 'versions']);
+
+        session()->flash('message', 'Version created successfully.');
+    }
+
+    public function cancelCreateVersion(): void
+    {
+        $this->reset(['versionChangeNotes', 'showCreateVersionModal']);
     }
 
     public function render(): View
