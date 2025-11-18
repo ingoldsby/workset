@@ -18,7 +18,7 @@ class WgerApiService
     /**
      * Get HTTP client with base configuration
      */
-    protected function client(): PendingRequest
+    public function client(): PendingRequest
     {
         return Http::baseUrl(self::BASE_URL)
             ->timeout(30)
@@ -29,7 +29,8 @@ class WgerApiService
     }
 
     /**
-     * Fetch all exercises from wger API
+     * Fetch all exercises from wger API using exerciseinfo endpoint
+     * This endpoint has translations with names/descriptions plus muscle/equipment data
      */
     public function fetchExercises(int $limit = 100): array
     {
@@ -39,8 +40,7 @@ class WgerApiService
 
         while ($hasMore) {
             try {
-                $response = $this->client()->get('exercise/', [
-                    'language' => $this->languageId,
+                $response = $this->client()->get('exerciseinfo/', [
                     'limit' => $limit,
                     'offset' => $offset,
                 ]);

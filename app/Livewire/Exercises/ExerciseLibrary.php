@@ -78,11 +78,11 @@ class ExerciseLibrary extends Component
         }
 
         if ($this->muscleGroupFilter) {
-            $query->where('primary_muscle_group', $this->muscleGroupFilter);
+            $query->where('primary_muscle', $this->muscleGroupFilter);
         }
 
         if ($this->equipmentFilter) {
-            $query->where('equipment_type', $this->equipmentFilter);
+            $query->where('equipment', $this->equipmentFilter);
         }
 
         return $query->take(50)->get();
