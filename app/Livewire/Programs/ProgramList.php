@@ -22,7 +22,7 @@ class ProgramList extends Component
 
     public function loadPrograms(): void
     {
-        $query = Program::with(['activeVersion', 'owner'])
+        $query = Program::with(['owner'])
             ->where('owner_id', Auth::id());
 
         if (Auth::user()->isPt()) {
