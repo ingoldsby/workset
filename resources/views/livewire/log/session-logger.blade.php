@@ -28,7 +28,7 @@
                     </div>
                 </div>
 
-                @if($exercises->isEmpty())
+                @if(empty($exercises))
                     <div class="text-center py-8 text-gray-500">
                         <p>{{ __('No exercises logged yet.') }}</p>
                         <p class="text-sm mt-2">{{ __('Add an exercise to get started.') }}</p>
@@ -78,7 +78,7 @@
                         {{ __('Add Exercise') }}
                     </button>
 
-                    @if(!$exercises->isEmpty())
+                    @if(!empty($exercises))
                         <button
                             wire:click="completeSession"
                             class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700"
@@ -134,7 +134,7 @@
 
                         {{-- Exercise List --}}
                         <div class="max-h-96 overflow-y-auto">
-                            @if($availableExercises->isEmpty())
+                            @if(empty($availableExercises))
                                 <div class="text-center py-8 text-gray-500">
                                     <p>{{ __('No exercises found.') }}</p>
                                 </div>
