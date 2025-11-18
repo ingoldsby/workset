@@ -13,39 +13,58 @@ class TestWgerApi extends Command
 
     public function handle(): int
     {
-        $this->info('Fetching sample exercises from wger...');
+        $this->info('Testing wger API endpoints...');
+        $this->newLine();
 
         $service = new WgerApiService();
-        $exercises = $service->fetchExercises(5); // Just get 5
 
+        // Test 1: List endpoint
+        $this->info('=== Test 1: /exercise/ list endpoint ===');
+        $exercises = $service->fetchExercises(5);
         $this->info('Fetched ' . count($exercises) . ' exercises');
-        $this->newLine();
 
-        if (empty($exercises)) {
-            $this->error('No exercises returned from API');
-            return self::FAILURE;
+        if (!empty($exercises)) {
+            $this->info('First exercise from list:');
+            $this->line(json_encode($exercises[0], JSON_PRETTY_PRINT));
+            $this->line('Has name field: ' . (isset($exercises[0]['name']) ? 'YES' : 'NO'));
+            $this->line('Has description field: ' . (isset($exercises[0]['description']) ? 'YES' : 'NO'));
         }
-
-        // Show first exercise structure
-        $this->info('First exercise data structure:');
-        $this->line(json_encode($exercises[0], JSON_PRETTY_PRINT));
         $this->newLine();
 
-        // Check for muscle data
-        $withMuscles = 0;
-        $withoutMuscles = 0;
+        // Test 2: exerciseinfo endpoint (includes translations)
+        $this->info('=== Test 2: /exerciseinfo/ endpoint ===');
+        $response = $service->client()->get('exerciseinfo/', [
+            'limit' => 5,
+            'language' => 2, // English
+        ]);
 
-        foreach ($exercises as $exercise) {
-            $hasMuscles = !empty($exercise['muscles']) || !empty($exercise['muscles_secondary']);
-            if ($hasMuscles) {
-                $withMuscles++;
+        if ($response->successful()) {
+            $data = $response->json();
+            $infos = $data['results'] ?? [];
+            $this->info('Fetched ' . count($infos) . ' exercise infos');
+
+            if (!empty($infos)) {
+                $this->info('First exerciseinfo:');
+                $this->line(json_encode($infos[0], JSON_PRETTY_PRINT));
+            }
+        } else {
+            $this->error('Failed to fetch exerciseinfo');
+        }
+        $this->newLine();
+
+        // Test 3: Individual exercise detail
+        if (!empty($exercises)) {
+            $firstId = $exercises[0]['id'];
+            $this->info("=== Test 3: /exercise/{$firstId}/ detail endpoint ===");
+            $detail = $service->fetchExerciseDetails($firstId);
+
+            if ($detail) {
+                $this->info('Exercise detail:');
+                $this->line(json_encode($detail, JSON_PRETTY_PRINT));
             } else {
-                $withoutMuscles++;
+                $this->error('Failed to fetch exercise detail');
             }
         }
-
-        $this->info("Exercises WITH muscle data: {$withMuscles}");
-        $this->info("Exercises WITHOUT muscle data: {$withoutMuscles}");
 
         return self::SUCCESS;
     }

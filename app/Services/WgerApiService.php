@@ -18,7 +18,7 @@ class WgerApiService
     /**
      * Get HTTP client with base configuration
      */
-    protected function client(): PendingRequest
+    public function client(): PendingRequest
     {
         return Http::baseUrl(self::BASE_URL)
             ->timeout(30)
