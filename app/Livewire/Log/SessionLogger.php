@@ -7,7 +7,6 @@ use App\Models\MemberExercise;
 use App\Models\SessionExercise;
 use App\Models\SessionSet;
 use App\Models\TrainingSession;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -16,12 +15,12 @@ class SessionLogger extends Component
 {
     public ?string $sessionId = null;
     public ?TrainingSession $session = null;
-    public Collection $exercises;
+    public array $exercises = [];
     public int $restTimerSeconds = 0;
     public bool $timerActive = false;
     public bool $showExerciseSelector = false;
     public string $exerciseSearch = '';
-    public Collection $availableExercises;
+    public array $availableExercises = [];
 
     public function mount(?string $sessionId = null): void
     {
@@ -31,9 +30,6 @@ class SessionLogger extends Component
 
             $this->authorize('update', $this->session);
         }
-
-        $this->exercises = collect();
-        $this->availableExercises = collect();
     }
 
     public function openExerciseSelector(): void
@@ -60,7 +56,8 @@ class SessionLogger extends Component
             ->orderBy('name')
             ->limit(20)
             ->get()
-            ->map(fn($ex) => ['id' => $ex->id, 'name' => $ex->name, 'type' => 'global']);
+            ->map(fn($ex) => ['id' => $ex->id, 'name' => $ex->name, 'type' => 'global'])
+            ->all();
 
         $memberExercises = MemberExercise::query()
             ->where('user_id', Auth::id())
@@ -68,9 +65,10 @@ class SessionLogger extends Component
             ->orderBy('name')
             ->limit(20)
             ->get()
-            ->map(fn($ex) => ['id' => $ex->id, 'name' => $ex->name, 'type' => 'member']);
+            ->map(fn($ex) => ['id' => $ex->id, 'name' => $ex->name, 'type' => 'member'])
+            ->all();
 
-        $this->availableExercises = $memberExercises->concat($globalExercises);
+        $this->availableExercises = array_merge($memberExercises, $globalExercises);
     }
 
     public function selectExercise(string $exerciseId, string $exerciseType): void
@@ -86,8 +84,17 @@ class SessionLogger extends Component
                 'user_id' => Auth::id(),
                 'scheduled_date' => today(),
                 'started_at' => now(),
-                'is_planned' => false,
             ]);
+        }
+
+        // Check if exercise already exists in this session
+        $isDuplicate = collect($this->exercises)->contains(function ($ex) use ($exerciseId, $exerciseType) {
+            return $ex['id'] === $exerciseId && $ex['type'] === $exerciseType;
+        });
+
+        if ($isDuplicate) {
+            session()->flash('warning', __('This exercise has already been added to the session.'));
+            return;
         }
 
         $exercise = $exerciseType === 'global'
@@ -103,41 +110,49 @@ class SessionLogger extends Component
             'training_session_id' => $this->session->id,
             'exercise_id' => $exerciseType === 'global' ? $exerciseId : null,
             'member_exercise_id' => $exerciseType === 'member' ? $exerciseId : null,
-            'order' => $this->exercises->count(),
+            'order' => count($this->exercises),
         ]);
 
-        $this->exercises->push([
+        $this->exercises[] = [
             'session_exercise_id' => $sessionExercise->id,
             'id' => $exerciseId,
             'type' => $exerciseType,
             'name' => $exercise->name,
             'sets' => [],
-        ]);
+        ];
     }
 
     public function addSet(int $exerciseIndex, array $setData): void
     {
-        $exercise = $this->exercises->get($exerciseIndex);
-
-        if (! $exercise) {
+        if (! isset($this->exercises[$exerciseIndex])) {
             return;
         }
+
+        $exercise = $this->exercises[$exerciseIndex];
 
         $set = SessionSet::create([
             'session_exercise_id' => $exercise['session_exercise_id'],
             'set_number' => count($exercise['sets']) + 1,
-            'performed_weight' => $setData['weight'] ?? null,
-            'performed_reps' => $setData['reps'] ?? null,
-            'performed_rpe' => $setData['rpe'] ?? null,
+            'performed_weight' => $this->sanitizeNumericInput($setData['weight'] ?? null),
+            'performed_reps' => $this->sanitizeNumericInput($setData['reps'] ?? null),
+            'performed_rpe' => $this->sanitizeNumericInput($setData['rpe'] ?? null),
         ]);
 
-        $exercise['sets'][] = $set;
-        $this->exercises->put($exerciseIndex, $exercise);
+        $this->exercises[$exerciseIndex]['sets'][] = $set;
 
         // Start rest timer if configured
         if (isset($setData['restTime']) && $setData['restTime'] > 0) {
             $this->startRestTimer($setData['restTime']);
         }
+    }
+
+    private function sanitizeNumericInput(mixed $value): ?float
+    {
+        if ($value === '' || $value === null) {
+            return null;
+        }
+
+        return (float) $value;
     }
 
     public function startRestTimer(int $seconds): void

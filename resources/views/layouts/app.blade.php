@@ -7,12 +7,15 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- PWA Manifest -->
-        <link rel="manifest" href="/manifest.json">
-        <meta name="theme-color" content="#2563eb">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
+        @if(config('app.env') === 'production')
+            <!-- PWA Manifest -->
+            <link rel="manifest" href="/manifest.json">
+            <meta name="theme-color" content="#2563eb">
+            <meta name="apple-mobile-web-app-capable" content="yes">
+            <meta name="mobile-web-app-capable" content="yes">
+            <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+            <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -20,7 +23,10 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <script src="/pwa-register.js" defer></script>
+
+        @if(config('app.env') === 'production')
+            <script src="/pwa-register.js" defer></script>
+        @endif
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">

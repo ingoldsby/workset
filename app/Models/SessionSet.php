@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class SessionSet extends Model
 {
@@ -53,6 +54,30 @@ class SessionSet extends Model
     public function sessionExercise(): BelongsTo
     {
         return $this->belongsTo(SessionExercise::class);
+    }
+
+    public function exercise(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            Exercise::class,
+            SessionExercise::class,
+            'id',
+            'id',
+            'session_exercise_id',
+            'exercise_id'
+        );
+    }
+
+    public function memberExercise(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            MemberExercise::class,
+            SessionExercise::class,
+            'id',
+            'id',
+            'session_exercise_id',
+            'member_exercise_id'
+        );
     }
 
     public function isCompleted(): bool
