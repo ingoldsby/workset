@@ -90,14 +90,14 @@
                                 <div class="flex-1">
                                     <h4 class="font-semibold text-gray-900">{{ $exercise->name }}</h4>
                                     <div class="mt-1 flex flex-wrap gap-2 text-xs">
-                                        @if($exercise->primary_muscle_group)
+                                        @if($exercise->primary_muscle)
                                             <span class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                                                {{ $exercise->primary_muscle_group->label() }}
+                                                {{ $exercise->primary_muscle->label() }}
                                             </span>
                                         @endif
-                                        @if($exercise->equipment_type)
+                                        @if($exercise->equipment)
                                             <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded">
-                                                {{ $exercise->equipment_type->label() }}
+                                                {{ $exercise->equipment->label() }}
                                             </span>
                                         @endif
                                     </div>
